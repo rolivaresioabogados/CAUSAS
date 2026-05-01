@@ -37,9 +37,8 @@
     .header-actions { display: flex; gap: 8px; }
     .btn-icon { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 10px; padding: 9px 13px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .btn-icon:active { opacity: 0.7; }
-
     .search-wrap { position: relative; }
-    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 15px; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
     #searchInput { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 12px 12px 40px; color: var(--text); font-family: var(--font-display); font-size: 15px; outline: none; }
     #searchInput:focus { border-color: var(--accent); }
     #searchInput::placeholder { color: var(--muted); }
@@ -55,37 +54,27 @@
     .filter-row::-webkit-scrollbar { display: none; }
     .filter-btn { flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; color: var(--muted); font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; min-height: 42px; }
     .filter-btn.active { border-color: var(--accent); color: var(--accent); }
-    .filter-row::-webkit-scrollbar { display: none; }
-    .filter-btn { flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; color: var(--muted); font-family: var(--font-display); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-    .filter-btn.active { border-color: var(--accent); color: var(--accent); }
 
-    main { flex: 1; padding: 16px 16px calc(20px + var(--safe-bottom)); }
+    main { flex: 1; padding: 0 16px calc(20px + var(--safe-bottom)); }
 
-    /* ── Card ── */
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.15s; }
     .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--status-color, var(--muted)); }
     .card:active { transform: scale(0.985); opacity: 0.9; }
-
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
     .card-cliente { font-size: 16px; font-weight: 800; flex: 1; padding-right: 10px; line-height: 1.3; }
     .status-badge { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-    .card-rut { font-size: 11px; font-family: var(--font-mono); color: var(--muted); margin-bottom: 10px; }
-
+    .card-sub { font-size: 11px; font-family: var(--font-mono); color: var(--muted); margin-bottom: 10px; }
     .card-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
     .card-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
     .card-tag.highlight { color: var(--accent); border-color: rgba(45,212,191,0.3); background: rgba(45,212,191,0.07); }
-
     .card-meta2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .meta-item { display: flex; flex-direction: column; gap: 2px; }
     .meta-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .meta-value { font-size: 12px; color: var(--text); font-family: var(--font-mono); }
-
     .card-footer { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .monto { font-size: 15px; font-weight: 700; font-family: var(--font-mono); color: var(--accent2); }
     .fecha-small { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
 
-    /* ── States ── */
     .state-box { text-align: center; padding: 60px 20px; color: var(--muted); }
     .state-box .icon { font-size: 48px; margin-bottom: 16px; }
     .state-box h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
@@ -93,17 +82,14 @@
     .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Modals ── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .modal-overlay.open { opacity: 1; pointer-events: all; }
     .modal { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + var(--safe-bottom)); width: 100%; max-height: 90dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32,0.72,0,1); }
     .modal-overlay.open .modal { transform: translateY(0); }
     .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
-
     .modal-client { font-size: 22px; font-weight: 800; margin-bottom: 4px; line-height: 1.3; }
-    .modal-rut { font-size: 13px; font-family: var(--font-mono); color: var(--muted); margin-bottom: 10px; }
+    .modal-sub { font-size: 13px; font-family: var(--font-mono); color: var(--muted); margin-bottom: 6px; }
     .modal-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 100px; margin-bottom: 20px; }
-
     .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; margin-top: 20px; }
     .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .detail-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
@@ -113,10 +99,8 @@
     .detail-value.accent { color: var(--accent); font-family: var(--font-mono); }
     .detail-value.money { color: var(--accent2); font-family: var(--font-mono); font-size: 18px; font-weight: 800; }
     .detail-value.muted { color: var(--muted); font-size: 12px; }
-
     .btn-close { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; color: var(--muted); font-family: var(--font-display); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 20px; }
 
-    /* Config */
     .config-body { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + var(--safe-bottom)); width: 100%; max-height: 92dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32,0.72,0,1); }
     .modal-overlay.open .config-body { transform: translateY(0); }
     .config-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
@@ -143,8 +127,8 @@
       <div class="logo-text">Causas<span>.</span></div>
     </div>
     <div class="header-actions">
-      <button class="btn-icon" onclick="recargar()" title="Actualizar">🔄</button>
-      <button class="btn-icon" onclick="openModal('configModal')" title="Configurar">⚙️</button>
+      <button class="btn-icon" onclick="recargar()">🔄</button>
+      <button class="btn-icon" onclick="openModal('configModal')">⚙️</button>
     </div>
   </div>
   <div class="search-wrap">
@@ -178,13 +162,7 @@
   <div class="config-body">
     <div class="modal-handle"></div>
     <div class="config-title">Configuración</div>
-    <p class="config-sub">URL del Apps Script y mapeo de columnas.</p>
-
-    <div class="input-group">
-      <label class="input-label">URL del Apps Script</label>
-      <input type="url" class="text-input" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" />
-    </div>
-
+    <p class="config-sub">Ajusta el mapeo de columnas si es necesario.</p>
     <div class="input-group">
       <label class="input-label">¿Primera fila es encabezado?</label>
       <select class="text-input" id="hasHeader">
@@ -192,9 +170,7 @@
         <option value="0">No — leer desde fila 1</option>
       </select>
     </div>
-
     <div class="divider"></div>
-
     <div class="input-group">
       <label class="input-label" style="margin-bottom:12px">Mapeo de columnas</label>
       <div class="col-row"><span class="col-lbl">Rol</span><input class="col-in" id="col_rol" placeholder="A" /></div>
@@ -213,17 +189,15 @@
       <div class="col-row"><span class="col-lbl">Abogado</span><input class="col-in" id="col_abogado" placeholder="Q" /></div>
       <div class="col-row"><span class="col-lbl">Observaciones</span><input class="col-in" id="col_obs" placeholder="R" /></div>
     </div>
-
-    <button class="btn-primary" onclick="saveAndLoad()">✅ Guardar y cargar</button>
+    <button class="btn-primary" onclick="saveConfig()">✅ Guardar</button>
     <button class="btn-close" onclick="closeModal('configModal')">Cancelar</button>
   </div>
 </div>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKtxI7sZcGGqdVf9fSdHd3Mui1VKMOUJecI8q4W8O_BQhO8RGbye1On38oc6YOZHdoKg/exec';
+  const SHEET_ID = '1gqpZMP1b8JiTUjOVdcCAiARqzsF9bACPFOLFeufDRo0';
 
   const DEFAULT_CFG = {
-    scriptUrl: SCRIPT_URL,
     hasHeader: '1',
     col_rol: 'A', col_tribunal: 'B', col_rolica: 'C',
     col_cliente: 'E', col_demandado: 'F', col_rut: 'G',
@@ -232,8 +206,8 @@
     col_revision: 'P', col_abogado: 'Q', col_obs: 'R'
   };
 
-  let allCausas = [], activeFilter = 'all', activeTribunal = null;
-  let config = JSON.parse(localStorage.getItem('causas_v4') || 'null') || DEFAULT_CFG;
+  let allCausas = [], activeFilter = 'all', activeAbogado = null;
+  let config = JSON.parse(localStorage.getItem('causas_v5') || 'null') || DEFAULT_CFG;
 
   const STATUS_MAP = {
     'activo':    {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
@@ -261,18 +235,27 @@
     return v.toUpperCase().charCodeAt(0) - 65;
   }
 
-  function cv(row, col) { const i = ci(col); return i >= 0 && i < row.length ? String(row[i] ?? '').trim() : ''; }
+  function formatFecha(f) {
+    if (!f) return '';
+    const d = new Date(f);
+    if (isNaN(d.getTime())) return f;
+    return d.toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'});
+  }
+
+  function formatMonto(m) {
+    if (!m) return '';
+    const n = parseFloat(m.toString().replace(/[^0-9.-]/g,''));
+    if (isNaN(n)) return m;
+    return '$' + n.toLocaleString('es-CL');
+  }
 
   async function loadSheetData(cfg) {
     showLoading();
     try {
-      // Usar gviz de Google Sheets directamente — no requiere proxy
-      const sheetId = '1gqpZMP1b8JiTUjOVdcCAiARqzsF9bACPFOLFeufDRo0';
-      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
       const text = await res.text();
-      // Extraer JSON del wrapper de Google
       const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
       const rows = json.table.rows;
       const start = cfg.hasHeader === '1' ? 1 : 0;
@@ -302,7 +285,7 @@
         revision:   gcv(row, cfg.col_revision),
         abogado:    gcv(row, cfg.col_abogado),
         obs:        gcv(row, cfg.col_obs),
-      })).filter(c => c.cliente || c.rol);
+      })).filter(c => c.cliente || c.rol || c.demandado);
       renderAll();
     } catch(e) {
       showError(e);
@@ -340,7 +323,7 @@
   }
 
   function setAbogado(val, el) {
-    activeTribunal = val;
+    activeAbogado = val;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     filterCausas();
@@ -352,7 +335,7 @@
       const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs].join(' ').toLowerCase();
       const matchQ = !q || txt.includes(q);
       const matchE = activeFilter === 'all' || c.estado === activeFilter;
-      const matchA = !activeTribunal || c.abogado === activeTribunal;
+      const matchA = !activeAbogado || c.abogado === activeAbogado;
       return matchQ && matchE && matchA;
     });
     renderCards(filtered);
@@ -371,8 +354,8 @@
           <div class="card-cliente">${c.demandado||c.cliente||'—'}</div>
           <div class="status-badge" style="background:${s.bg};color:${s.color}">${c.estado||'Sin estado'}</div>
         </div>
-        ${c.cliente ? `<div class="card-rut">Cliente: ${c.cliente}</div>` : ''}
-        ${c.rut ? `<div class="card-rut">RUT ${c.rut}</div>` : ''}
+        ${c.cliente ? `<div class="card-sub">Cliente: ${c.cliente}</div>` : ''}
+        ${c.rut ? `<div class="card-sub">RUT ${c.rut}</div>` : ''}
         <div class="card-row">
           ${c.rol ? `<span class="card-tag highlight">ROL ${c.rol}</span>` : ''}
           ${c.tribunal ? `<span class="card-tag">${c.tribunal}</span>` : ''}
@@ -387,31 +370,14 @@
     }).join('');
   }
 
-  function formatFecha(f) {
-    if (!f) return '';
-    const d = new Date(f);
-    if (isNaN(d)) return f;
-    return d.toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'});
-  }
-
-  function formatMonto(m) {
-    if (!m) return '';
-    const n = parseFloat(m.toString().replace(/[^0-9.-]/g,''));
-    if (isNaN(n)) return m;
-    return '$' + n.toLocaleString('es-CL');
-  }
-
   function openDetail(id) {
     const c = allCausas.find(x => x.id === id); if (!c) return;
     const s = getStatus(c.estado);
-    const row = (label, value, cls='') => value ? `<div class="detail-item${cls}"><div class="detail-label">${label}</div><div class="detail-value ${cls.includes('full')?'':''}${cls}">${value}</div></div>` : '';
-
     document.getElementById('modalContent').innerHTML = `
-      <div class="modal-client">${c.cliente||'Sin nombre'}</div>
-      ${c.demandado ? `<div class="modal-rut">vs. ${c.demandado}</div>` : ''}
-      ${c.rut ? `<div class="modal-rut">RUT ${c.rut}</div>` : ''}
+      <div class="modal-client">${c.demandado||c.cliente||'Sin nombre'}</div>
+      ${c.cliente ? `<div class="modal-sub">Cliente: ${c.cliente}</div>` : ''}
+      ${c.rut ? `<div class="modal-sub">RUT ${c.rut}</div>` : ''}
       <div class="modal-status" style="background:${s.bg};color:${s.color}">● ${c.estado||'Sin estado'}</div>
-
       <div class="section-label">Identificación</div>
       <div class="detail-grid">
         <div class="detail-item"><div class="detail-label">Rol</div><div class="detail-value accent">${c.rol||'—'}</div></div>
@@ -419,29 +385,25 @@
         <div class="detail-item full"><div class="detail-label">Tribunal</div><div class="detail-value">${c.tribunal||'—'}</div></div>
         <div class="detail-item full"><div class="detail-label">Materia</div><div class="detail-value">${c.materia||'—'}</div></div>
       </div>
-
       <div class="section-label">Seguimiento</div>
       <div class="detail-grid">
         <div class="detail-item"><div class="detail-label">Etapa</div><div class="detail-value">${c.etapa||'—'}</div></div>
         <div class="detail-item"><div class="detail-label">Fecha Demanda</div><div class="detail-value">${formatFecha(c.fecha)||'—'}</div></div>
-        <div class="detail-item"><div class="detail-label">Última Revisión</div><div class="detail-value">${c.revision||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Última Revisión</div><div class="detail-value">${formatFecha(c.revision)||'—'}</div></div>
         ${c.monto ? `<div class="detail-item"><div class="detail-label">Monto</div><div class="detail-value money">${formatMonto(c.monto)}</div></div>` : ''}
       </div>
-
       <div class="section-label">Equipo</div>
       <div class="detail-grid">
         <div class="detail-item full"><div class="detail-label">Abogado</div><div class="detail-value">${c.abogado||'—'}</div></div>
         <div class="detail-item full"><div class="detail-label">Abogado Coordinador</div><div class="detail-value">${c.abog_coord||'—'}</div></div>
       </div>
-
       ${c.obs ? `<div class="section-label">Observaciones</div><div class="detail-grid"><div class="detail-item full"><div class="detail-label">Notas</div><div class="detail-value muted">${c.obs}</div></div></div>` : ''}
     `;
     openModal('detailModal');
   }
 
   function openModal(id) {
-    if (id === 'configModal' && config) {
-      document.getElementById('scriptUrl').value = config.scriptUrl||'';
+    if (id === 'configModal') {
       document.getElementById('hasHeader').value = config.hasHeader||'1';
       ['rol','tribunal','rolica','cliente','demandado','rut','abog_coord','materia','monto','estado','fecha','etapa','revision','abogado','obs'].forEach(k => {
         const el = document.getElementById('col_'+k);
@@ -455,11 +417,8 @@
   function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
   function bgClose(e, id) { if (e.target === e.currentTarget) closeModal(id); }
 
-  function saveAndLoad() {
-    const scriptUrl = document.getElementById('scriptUrl').value.trim();
-    if (!scriptUrl) { alert('Ingresa la URL del script'); return; }
+  function saveConfig() {
     config = {
-      scriptUrl,
       hasHeader: document.getElementById('hasHeader').value,
       col_rol:        document.getElementById('col_rol').value||'A',
       col_tribunal:   document.getElementById('col_tribunal').value||'B',
@@ -477,7 +436,7 @@
       col_abogado:    document.getElementById('col_abogado').value||'Q',
       col_obs:        document.getElementById('col_obs').value||'R',
     };
-    localStorage.setItem('causas_v4', JSON.stringify(config));
+    localStorage.setItem('causas_v5', JSON.stringify(config));
     closeModal('configModal');
     loadSheetData(config);
   }
