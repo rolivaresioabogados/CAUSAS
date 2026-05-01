@@ -266,7 +266,7 @@
   async function loadSheetData(cfg) {
     showLoading();
     try {
-      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(cfg.scriptUrl)}`;
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(cfg.scriptUrl)}`;
       const res = await fetch(proxyUrl);
       if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
       const raw = await res.json();
