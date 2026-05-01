@@ -55,6 +55,8 @@
     .filter-btn { flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; color: var(--muted); font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; min-height: 42px; }
     .filter-btn.active { border-color: var(--accent); color: var(--accent); }
 
+    .filters-wrap { position: sticky; z-index: 99; background: var(--bg); border-bottom: 1px solid var(--border); }
+
     main { flex: 1; padding: 0 16px calc(20px + var(--safe-bottom)); }
 
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.15s; }
@@ -137,8 +139,10 @@
   </div>
 </header>
 
-<div class="stats-bar" id="statsBar" style="position:sticky;top:var(--header-h,88px);z-index:99;"></div>
-<div class="filter-row" id="filterRow" style="position:sticky;top:var(--header-h2,140px);z-index:98;"></div>
+<div class="filters-wrap" id="filtersWrap">
+  <div class="stats-bar" id="statsBar"></div>
+  <div class="filter-row" id="filterRow"></div>
+</div>
 
 <main id="mainContent">
   <div class="state-box">
@@ -444,7 +448,15 @@
   function showLoading() { document.getElementById('mainContent').innerHTML = `<div class="state-box"><div class="spinner"></div><h3>Cargando causas…</h3><p>Conectando con Google Sheets</p></div>`; }
   function showError(e) { document.getElementById('mainContent').innerHTML = `<div class="state-box"><div class="icon">⚠️</div><h3>Error al cargar</h3><p>${e.message}</p><br><button class="btn-icon" style="margin:0 auto" onclick="openModal('configModal')">⚙️ Configurar</button></div>`; }
 
+  // Posicionar filtros justo debajo del header
+  function positionFilters() {
+    const h = document.querySelector('header').offsetHeight;
+    document.getElementById('filtersWrap').style.top = h + 'px';
+  }
+
   loadSheetData(config);
+  setTimeout(positionFilters, 100);
+  window.addEventListener('resize', positionFilters);
 </script>
 </body>
 </html>
