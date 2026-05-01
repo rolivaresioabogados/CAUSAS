@@ -380,6 +380,8 @@
     if (isNaN(d)) return f;
     return d.toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'});
   }
+
+  function formatMonto(m) {
     if (!m) return '';
     const n = parseFloat(m.toString().replace(/[^0-9.-]/g,''));
     if (isNaN(n)) return m;
