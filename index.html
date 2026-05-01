@@ -303,20 +303,43 @@
     const bar = document.getElementById('statsBar');
     const estados = {};
     allCausas.forEach(c => { const e = c.estado||'Sin estado'; estados[e]=(estados[e]||0)+1; });
-    let html = `<div class="stat-chip active" onclick="setEstado('all',this)"><span class="dot"></span>Todas <span class="count-badge">${allCausas.length}</span></div>`;
+    bar.innerHTML = '';
+
+    const all = document.createElement('div');
+    all.className = 'stat-chip active';
+    all.innerHTML = `<span class="dot"></span>Todas <span class="count-badge">${allCausas.length}</span>`;
+    all.addEventListener('click', () => setEstado('all', all));
+    bar.appendChild(all);
+
     Object.entries(estados).forEach(([e,n]) => {
       const s = getStatus(e);
-      html += `<div class="stat-chip" style="color:${s.color}" onclick="setEstado(${JSON.stringify(e)},this)"><span class="dot"></span>${e} <span class="count-badge">${n}</span></div>`;
+      const chip = document.createElement('div');
+      chip.className = 'stat-chip';
+      chip.style.color = s.color;
+      chip.innerHTML = `<span class="dot"></span>${e} <span class="count-badge">${n}</span>`;
+      chip.addEventListener('click', () => setEstado(e, chip));
+      bar.appendChild(chip);
     });
-    bar.innerHTML = html;
   }
 
   function buildFilters() {
     const row = document.getElementById('filterRow');
     const abogados = [...new Set(allCausas.map(c=>c.abogado).filter(Boolean))];
-    let html = `<button class="filter-btn active" onclick="setAbogado(null,this)">Todos</button>`;
-    abogados.forEach(a => { html += `<button class="filter-btn" onclick="setAbogado(${JSON.stringify(a)},this)">${a}</button>`; });
-    row.innerHTML = html;
+    row.innerHTML = '';
+
+    const all = document.createElement('button');
+    all.className = 'filter-btn active';
+    all.textContent = 'Todos';
+    all.addEventListener('click', () => setAbogado(null, all));
+    row.appendChild(all);
+
+    abogados.forEach(a => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.textContent = a;
+      btn.addEventListener('click', () => setAbogado(a, btn));
+      row.appendChild(btn);
+    });
   }
 
   function setEstado(val, el) {
