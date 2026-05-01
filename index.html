@@ -21,50 +21,71 @@
     html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-display); overflow-x: hidden; }
     body { display: flex; flex-direction: column; min-height: 100dvh; }
 
-    header { padding: calc(16px + var(--safe-top)) 20px 16px; position: sticky; top: 0; z-index: 100; background: rgba(11,18,32,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    header {
+      padding: calc(16px + var(--safe-top)) 20px 16px;
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11,18,32,0.97);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--accent);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
     .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), #0ea5e9); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent), #0ea5e9); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
     .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
     .logo-text span { color: var(--accent); }
     .header-actions { display: flex; gap: 8px; }
-    .btn-icon { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 10px; padding: 8px 12px; font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .btn-icon { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 10px; padding: 9px 13px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .btn-icon:active { opacity: 0.7; }
+
     .search-wrap { position: relative; }
-    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 15px; }
     #searchInput { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 12px 12px 40px; color: var(--text); font-family: var(--font-display); font-size: 15px; outline: none; }
     #searchInput:focus { border-color: var(--accent); }
     #searchInput::placeholder { color: var(--muted); }
 
-    .stats-bar { display: flex; gap: 8px; padding: 12px 16px 4px; overflow-x: auto; scrollbar-width: none; }
+    .stats-bar { display: flex; gap: 10px; padding: 20px 16px 12px; overflow-x: auto; scrollbar-width: none; }
     .stats-bar::-webkit-scrollbar { display: none; }
-    .stat-chip { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .stat-chip { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; min-height: 48px; }
     .stat-chip.active { background: var(--accent); border-color: var(--accent); color: #0b1220; }
-    .stat-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-    .count-badge { font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 100px; background: rgba(0,0,0,0.15); }
+    .stat-chip .dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .count-badge { font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 100px; background: rgba(0,0,0,0.15); }
 
-    .filter-row { display: flex; gap: 8px; padding: 10px 16px 14px; overflow-x: auto; scrollbar-width: none; }
+    .filter-row { display: flex; gap: 8px; padding: 8px 16px 20px; overflow-x: auto; scrollbar-width: none; }
     .filter-row::-webkit-scrollbar { display: none; }
-    .filter-btn { flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; color: var(--muted); font-family: var(--font-display); font-size: 12px; font-weight: 600; cursor: pointer; }
+    .filter-btn { flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; color: var(--muted); font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; min-height: 42px; }
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-btn { flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; color: var(--muted); font-family: var(--font-display); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
     .filter-btn.active { border-color: var(--accent); color: var(--accent); }
 
     main { flex: 1; padding: 16px 16px calc(20px + var(--safe-bottom)); }
 
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; cursor: pointer; position: relative; overflow: hidden; }
-    .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--status-color, var(--muted)); }
-    .card:active { opacity: 0.8; }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .card-name { font-size: 15px; font-weight: 700; flex: 1; padding-right: 10px; line-height: 1.3; }
+    /* ── Card ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.15s; }
+    .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--status-color, var(--muted)); }
+    .card:active { transform: scale(0.985); opacity: 0.9; }
+
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .card-cliente { font-size: 16px; font-weight: 800; flex: 1; padding-right: 10px; line-height: 1.3; }
     .status-badge { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .card-rut { font-size: 11px; font-family: var(--font-mono); color: var(--muted); margin-bottom: 10px; }
+
+    .card-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .card-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+    .card-tag.highlight { color: var(--accent); border-color: rgba(45,212,191,0.3); background: rgba(45,212,191,0.07); }
+
+    .card-meta2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .meta-item { display: flex; flex-direction: column; gap: 2px; }
     .meta-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .meta-value { font-size: 13px; color: var(--text); }
-    .meta-value.mono { font-family: var(--font-mono); font-size: 12px; }
-    .card-footer { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .monto { font-size: 15px; font-weight: 700; font-family: var(--font-mono); color: var(--accent2); }
-    .fecha { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+    .meta-value { font-size: 12px; color: var(--text); font-family: var(--font-mono); }
 
+    .card-footer { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .monto { font-size: 15px; font-weight: 700; font-family: var(--font-mono); color: var(--accent2); }
+    .fecha-small { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+
+    /* ── States ── */
     .state-box { text-align: center; padding: 60px 20px; color: var(--muted); }
     .state-box .icon { font-size: 48px; margin-bottom: 16px; }
     .state-box h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
@@ -72,45 +93,45 @@
     .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── Modals ── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + var(--safe-bottom)); width: 100%; max-height: 88dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32,0.72,0,1); }
+    .modal { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + var(--safe-bottom)); width: 100%; max-height: 90dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32,0.72,0,1); }
     .modal-overlay.open .modal { transform: translateY(0); }
     .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
-    .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; line-height: 1.3; }
+
+    .modal-client { font-size: 22px; font-weight: 800; margin-bottom: 4px; line-height: 1.3; }
+    .modal-rut { font-size: 13px; font-family: var(--font-mono); color: var(--muted); margin-bottom: 10px; }
     .modal-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 100px; margin-bottom: 20px; }
-    .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
-    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+
+    .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; margin-top: 20px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .detail-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
     .detail-item.full { grid-column: 1 / -1; }
     .detail-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .detail-value { font-size: 14px; font-weight: 600; color: var(--text); word-break: break-word; }
+    .detail-value { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-word; line-height: 1.4; }
     .detail-value.accent { color: var(--accent); font-family: var(--font-mono); }
-    .detail-value.money { color: var(--accent2); font-family: var(--font-mono); font-size: 18px; }
-    .btn-close { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; color: var(--muted); font-family: var(--font-display); font-size: 15px; font-weight: 600; cursor: pointer; }
+    .detail-value.money { color: var(--accent2); font-family: var(--font-mono); font-size: 18px; font-weight: 800; }
+    .detail-value.muted { color: var(--muted); font-size: 12px; }
 
-    /* Config modal */
+    .btn-close { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; color: var(--muted); font-family: var(--font-display); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+
+    /* Config */
     .config-body { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + var(--safe-bottom)); width: 100%; max-height: 92dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32,0.72,0,1); }
     .modal-overlay.open .config-body { transform: translateY(0); }
     .config-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
     .config-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
-    .input-group { margin-bottom: 16px; }
+    .input-group { margin-bottom: 14px; }
     .input-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px; display: block; }
     .text-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 14px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; }
     .text-input:focus { border-color: var(--accent); }
     .text-input::placeholder { color: var(--muted); font-size: 11px; }
     .btn-primary { width: 100%; background: var(--accent); border: none; border-radius: var(--radius); padding: 15px; color: #0b1220; font-family: var(--font-display); font-size: 15px; font-weight: 800; cursor: pointer; margin-bottom: 10px; }
-    .hint-box { background: rgba(45,212,191,0.07); border: 1px solid rgba(45,212,191,0.2); border-radius: var(--radius); padding: 14px; margin-bottom: 20px; }
-    .hint-box p { font-size: 12px; color: #7de8da; line-height: 1.7; }
-    .divider { height: 1px; background: var(--border); margin: 18px 0; }
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
     .col-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    .col-lbl { font-size: 12px; color: var(--muted); width: 95px; flex-shrink: 0; }
+    .col-lbl { font-size: 12px; color: var(--muted); width: 130px; flex-shrink: 0; }
     .col-in { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; }
     .col-in:focus { border-color: var(--accent); }
-
-    .connected-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #10b981; font-weight: 600; }
-    .connected-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   </style>
 </head>
 <body>
@@ -122,13 +143,13 @@
       <div class="logo-text">Causas<span>.</span></div>
     </div>
     <div class="header-actions">
-      <button class="btn-icon" onclick="recargar()" title="Actualizar datos">🔄</button>
-      <button class="btn-icon" onclick="openModal('configModal')">⚙️</button>
+      <button class="btn-icon" onclick="recargar()" title="Actualizar">🔄</button>
+      <button class="btn-icon" onclick="openModal('configModal')" title="Configurar">⚙️</button>
     </div>
   </div>
   <div class="search-wrap">
     <span class="search-icon">🔍</span>
-    <input type="search" id="searchInput" placeholder="Buscar causa, RUT, tribunal…" oninput="filterCausas()" />
+    <input type="search" id="searchInput" placeholder="Buscar cliente, RUT, rol, abogado…" oninput="filterCausas()" />
   </div>
 </header>
 
@@ -157,12 +178,7 @@
   <div class="config-body">
     <div class="modal-handle"></div>
     <div class="config-title">Configuración</div>
-    <p class="config-sub">Ajusta la URL del script y el mapeo de columnas de tu planilla.</p>
-
-    <div class="hint-box">
-      <p>La URL del Apps Script se ve así:<br>
-      <strong>https://script.google.com/macros/s/…/exec</strong></p>
-    </div>
+    <p class="config-sub">URL del Apps Script y mapeo de columnas.</p>
 
     <div class="input-group">
       <label class="input-label">URL del Apps Script</label>
@@ -170,7 +186,7 @@
     </div>
 
     <div class="input-group">
-      <label class="input-label">¿La primera fila tiene encabezados?</label>
+      <label class="input-label">¿Primera fila es encabezado?</label>
       <select class="text-input" id="hasHeader">
         <option value="1">Sí — saltar primera fila</option>
         <option value="0">No — leer desde fila 1</option>
@@ -180,37 +196,44 @@
     <div class="divider"></div>
 
     <div class="input-group">
-      <label class="input-label" style="margin-bottom:12px">Mapeo de columnas (letra o número)</label>
-      <div class="col-row"><span class="col-lbl">Nombre / RUT</span><input class="col-in" id="col_nombre" placeholder="A" /></div>
-      <div class="col-row"><span class="col-lbl">N° Causa</span><input class="col-in" id="col_causa" placeholder="B" /></div>
-      <div class="col-row"><span class="col-lbl">Tribunal</span><input class="col-in" id="col_tribunal" placeholder="C" /></div>
-      <div class="col-row"><span class="col-lbl">Estado</span><input class="col-in" id="col_estado" placeholder="D" /></div>
-      <div class="col-row"><span class="col-lbl">Fecha</span><input class="col-in" id="col_fecha" placeholder="E" /></div>
-      <div class="col-row"><span class="col-lbl">Monto</span><input class="col-in" id="col_monto" placeholder="F" /></div>
-      <div class="col-row"><span class="col-lbl">Notas / Otros</span><input class="col-in" id="col_notas" placeholder="G" /></div>
+      <label class="input-label" style="margin-bottom:12px">Mapeo de columnas</label>
+      <div class="col-row"><span class="col-lbl">Rol</span><input class="col-in" id="col_rol" placeholder="A" /></div>
+      <div class="col-row"><span class="col-lbl">Tribunal</span><input class="col-in" id="col_tribunal" placeholder="B" /></div>
+      <div class="col-row"><span class="col-lbl">Rol ICA</span><input class="col-in" id="col_rolica" placeholder="C" /></div>
+      <div class="col-row"><span class="col-lbl">Cliente</span><input class="col-in" id="col_cliente" placeholder="E" /></div>
+      <div class="col-row"><span class="col-lbl">Demandado</span><input class="col-in" id="col_demandado" placeholder="F" /></div>
+      <div class="col-row"><span class="col-lbl">RUT</span><input class="col-in" id="col_rut" placeholder="G" /></div>
+      <div class="col-row"><span class="col-lbl">Abogado Coordinador</span><input class="col-in" id="col_abog_coord" placeholder="H" /></div>
+      <div class="col-row"><span class="col-lbl">Materia</span><input class="col-in" id="col_materia" placeholder="I" /></div>
+      <div class="col-row"><span class="col-lbl">Monto</span><input class="col-in" id="col_monto" placeholder="J" /></div>
+      <div class="col-row"><span class="col-lbl">Estado</span><input class="col-in" id="col_estado" placeholder="K" /></div>
+      <div class="col-row"><span class="col-lbl">Fecha Demanda</span><input class="col-in" id="col_fecha" placeholder="L" /></div>
+      <div class="col-row"><span class="col-lbl">Etapa</span><input class="col-in" id="col_etapa" placeholder="O" /></div>
+      <div class="col-row"><span class="col-lbl">Última Revisión</span><input class="col-in" id="col_revision" placeholder="P" /></div>
+      <div class="col-row"><span class="col-lbl">Abogado</span><input class="col-in" id="col_abogado" placeholder="Q" /></div>
+      <div class="col-row"><span class="col-lbl">Observaciones</span><input class="col-in" id="col_obs" placeholder="R" /></div>
     </div>
 
-    <button class="btn-primary" onclick="saveAndLoad()">✅ Guardar y cargar datos</button>
+    <button class="btn-primary" onclick="saveAndLoad()">✅ Guardar y cargar</button>
     <button class="btn-close" onclick="closeModal('configModal')">Cancelar</button>
   </div>
 </div>
 
 <script>
-  // URL del Apps Script ya configurada
-  const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEYlOVMI5t32mkMPim7Eu4J9tbHHuL7etbpxwH_puUBr-1rqRXW_KYdRuzVnCa2kBHmg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEYlOVMI5t32mkMPim7Eu4J9tbHHuL7etbpxwH_puUBr-1rqRXW_KYdRuzVnCa2kBHmg/exec';
+
+  const DEFAULT_CFG = {
+    scriptUrl: SCRIPT_URL,
+    hasHeader: '1',
+    col_rol: 'A', col_tribunal: 'B', col_rolica: 'C',
+    col_cliente: 'E', col_demandado: 'F', col_rut: 'G',
+    col_abog_coord: 'H', col_materia: 'I', col_monto: 'J',
+    col_estado: 'K', col_fecha: 'L', col_etapa: 'O',
+    col_revision: 'P', col_abogado: 'Q', col_obs: 'R'
+  };
 
   let allCausas = [], activeFilter = 'all', activeTribunal = null;
-  let config = JSON.parse(localStorage.getItem('causas_script_cfg') || 'null');
-
-  // Si no hay config guardada, usar defaults con la URL ya configurada
-  if (!config) {
-    config = {
-      scriptUrl: DEFAULT_SCRIPT_URL,
-      hasHeader: '1',
-      col_nombre: 'A', col_causa: 'B', col_tribunal: 'C',
-      col_estado: 'D', col_fecha: 'E', col_monto: 'F', col_notas: 'G'
-    };
-  }
+  let config = JSON.parse(localStorage.getItem('causas_v4') || 'null') || DEFAULT_CFG;
 
   const STATUS_MAP = {
     'activo':    {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
@@ -223,9 +246,22 @@
     'terminado': {color:'#64748b',bg:'rgba(100,116,139,0.12)'},
   };
   const DEF = {color:'#64748b',bg:'rgba(100,116,139,0.12)'};
-  function getStatus(e){if(!e)return DEF;const k=e.toLowerCase().trim();for(const[key,v]of Object.entries(STATUS_MAP))if(k.includes(key))return v;return DEF;}
 
-  function colIdx(v){if(!v)return -1;v=v.toString().trim();if(/^\d+$/.test(v))return parseInt(v)-1;return v.toUpperCase().charCodeAt(0)-65;}
+  function getStatus(e) {
+    if (!e) return DEF;
+    const k = e.toLowerCase().trim();
+    for (const [key,v] of Object.entries(STATUS_MAP)) if (k.includes(key)) return v;
+    return DEF;
+  }
+
+  function ci(v) {
+    if (!v) return -1;
+    v = v.toString().trim();
+    if (/^\d+$/.test(v)) return parseInt(v) - 1;
+    return v.toUpperCase().charCodeAt(0) - 65;
+  }
+
+  function cv(row, col) { const i = ci(col); return i >= 0 && i < row.length ? String(row[i] ?? '').trim() : ''; }
 
   async function loadSheetData(cfg) {
     showLoading();
@@ -233,28 +269,33 @@
       const res = await fetch(cfg.scriptUrl);
       if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
       const raw = await res.json();
-      if (!Array.isArray(raw)) throw new Error('Formato inesperado de datos');
+      if (!Array.isArray(raw)) throw new Error('Formato inesperado');
       const start = cfg.hasHeader === '1' ? 1 : 0;
       allCausas = raw.slice(start).map((row, i) => ({
         id: i,
-        nombre:   String(row[colIdx(cfg.col_nombre  ||'A')]||''),
-        causa:    String(row[colIdx(cfg.col_causa   ||'B')]||''),
-        tribunal: String(row[colIdx(cfg.col_tribunal||'C')]||''),
-        estado:   String(row[colIdx(cfg.col_estado  ||'D')]||''),
-        fecha:    String(row[colIdx(cfg.col_fecha   ||'E')]||''),
-        monto:    String(row[colIdx(cfg.col_monto   ||'F')]||''),
-        notas:    String(row[colIdx(cfg.col_notas   ||'G')]||''),
-      })).filter(c => c.nombre || c.causa);
+        rol:        cv(row, cfg.col_rol),
+        tribunal:   cv(row, cfg.col_tribunal),
+        rolica:     cv(row, cfg.col_rolica),
+        cliente:    cv(row, cfg.col_cliente),
+        demandado:  cv(row, cfg.col_demandado),
+        rut:        cv(row, cfg.col_rut),
+        abog_coord: cv(row, cfg.col_abog_coord),
+        materia:    cv(row, cfg.col_materia),
+        monto:      cv(row, cfg.col_monto),
+        estado:     cv(row, cfg.col_estado),
+        fecha:      cv(row, cfg.col_fecha),
+        etapa:      cv(row, cfg.col_etapa),
+        revision:   cv(row, cfg.col_revision),
+        abogado:    cv(row, cfg.col_abogado),
+        obs:        cv(row, cfg.col_obs),
+      })).filter(c => c.cliente || c.rol);
       renderAll();
     } catch(e) {
       showError(e);
     }
   }
 
-  function recargar() {
-    if (config) loadSheetData(config);
-  }
-
+  function recargar() { loadSheetData(config); }
   function renderAll() { buildStats(); buildFilters(); filterCausas(); }
 
   function buildStats() {
@@ -264,45 +305,46 @@
     let html = `<div class="stat-chip active" onclick="setEstado('all',this)"><span class="dot"></span>Todas <span class="count-badge">${allCausas.length}</span></div>`;
     Object.entries(estados).forEach(([e,n]) => {
       const s = getStatus(e);
-      html += `<div class="stat-chip" style="color:${s.color}" onclick="setEstado('${e.replace(/'/g,"\\'")}',this)"><span class="dot"></span>${e} <span class="count-badge">${n}</span></div>`;
+      html += `<div class="stat-chip" style="color:${s.color}" onclick="setEstado(${JSON.stringify(e)},this)"><span class="dot"></span>${e} <span class="count-badge">${n}</span></div>`;
     });
     bar.innerHTML = html;
   }
 
   function buildFilters() {
     const row = document.getElementById('filterRow');
-    const tribunales = [...new Set(allCausas.map(c=>c.tribunal).filter(Boolean))];
-    let html = `<button class="filter-btn active" onclick="setTribunal(null,this)">Todos</button>`;
-    tribunales.forEach(t => { html += `<button class="filter-btn" onclick="setTribunal('${t.replace(/'/g,"\\'")}',this)">${t}</button>`; });
+    const abogados = [...new Set(allCausas.map(c=>c.abogado).filter(Boolean))];
+    let html = `<button class="filter-btn active" onclick="setAbogado(null,this)">Todos</button>`;
+    abogados.forEach(a => { html += `<button class="filter-btn" onclick="setAbogado(${JSON.stringify(a)},this)">${a}</button>`; });
     row.innerHTML = html;
   }
 
-  function setEstado(val,el){
-    activeFilter=val;
-    document.querySelectorAll('.stat-chip').forEach(c=>c.classList.remove('active'));
+  function setEstado(val, el) {
+    activeFilter = val;
+    document.querySelectorAll('.stat-chip').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     filterCausas();
   }
 
-  function setTribunal(val,el){
-    activeTribunal=val;
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  function setAbogado(val, el) {
+    activeTribunal = val;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     filterCausas();
   }
 
-  function filterCausas(){
+  function filterCausas() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const filtered = allCausas.filter(c => {
-      const matchQ = !q || [c.nombre,c.causa,c.tribunal,c.estado,c.notas].join(' ').toLowerCase().includes(q);
-      const matchE = activeFilter==='all' || c.estado===activeFilter;
-      const matchT = !activeTribunal || c.tribunal===activeTribunal;
-      return matchQ && matchE && matchT;
+      const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs].join(' ').toLowerCase();
+      const matchQ = !q || txt.includes(q);
+      const matchE = activeFilter === 'all' || c.estado === activeFilter;
+      const matchA = !activeTribunal || c.abogado === activeTribunal;
+      return matchQ && matchE && matchA;
     });
     renderCards(filtered);
   }
 
-  function renderCards(list){
+  function renderCards(list) {
     const main = document.getElementById('mainContent');
     if (!list.length) {
       main.innerHTML = `<div class="state-box"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Intenta con otro término o filtro.</p></div>`;
@@ -311,85 +353,122 @@
     main.innerHTML = list.map(c => {
       const s = getStatus(c.estado);
       return `<div class="card" style="--status-color:${s.color}" onclick="openDetail(${c.id})">
-        <div class="card-header">
-          <div class="card-name">${c.nombre||'—'}</div>
+        <div class="card-top">
+          <div class="card-cliente">${c.demandado||c.cliente||'—'}</div>
           <div class="status-badge" style="background:${s.bg};color:${s.color}">${c.estado||'Sin estado'}</div>
         </div>
-        <div class="card-meta">
-          <div class="meta-item"><span class="meta-label">N° Causa</span><span class="meta-value mono">${c.causa||'—'}</span></div>
-          <div class="meta-item"><span class="meta-label">Tribunal</span><span class="meta-value">${c.tribunal||'—'}</span></div>
+        ${c.cliente ? `<div class="card-rut">Cliente: ${c.cliente}</div>` : ''}
+        ${c.rut ? `<div class="card-rut">RUT ${c.rut}</div>` : ''}
+        <div class="card-row">
+          ${c.rol ? `<span class="card-tag highlight">ROL ${c.rol}</span>` : ''}
+          ${c.tribunal ? `<span class="card-tag">${c.tribunal}</span>` : ''}
+          ${c.materia ? `<span class="card-tag">${c.materia}</span>` : ''}
         </div>
-        ${(c.monto||c.fecha)?`<div class="card-footer"><span class="monto">${c.monto?formatMonto(c.monto):''}</span><span class="fecha">${c.fecha||''}</span></div>`:''}
+        <div class="card-meta2">
+          ${c.etapa ? `<div class="meta-item"><span class="meta-label">Etapa</span><span class="meta-value">${c.etapa}</span></div>` : ''}
+          ${c.abogado ? `<div class="meta-item"><span class="meta-label">Abogado</span><span class="meta-value">${c.abogado}</span></div>` : ''}
+        </div>
+        ${(c.monto||c.fecha) ? `<div class="card-footer"><span class="monto">${c.monto?formatMonto(c.monto):''}</span><span class="fecha-small">${formatFecha(c.fecha)}</span></div>` : ''}
       </div>`;
     }).join('');
   }
 
-  function formatMonto(m){
-    if(!m)return'';
-    const n=parseFloat(m.toString().replace(/[^0-9.-]/g,''));
-    if(isNaN(n))return m;
-    return'$'+n.toLocaleString('es-CL');
+  function formatFecha(f) {
+    if (!f) return '';
+    const d = new Date(f);
+    if (isNaN(d)) return f;
+    return d.toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'});
+  }
+    if (!m) return '';
+    const n = parseFloat(m.toString().replace(/[^0-9.-]/g,''));
+    if (isNaN(n)) return m;
+    return '$' + n.toLocaleString('es-CL');
   }
 
-  function openDetail(id){
-    const c = allCausas.find(x=>x.id===id); if(!c)return;
+  function openDetail(id) {
+    const c = allCausas.find(x => x.id === id); if (!c) return;
     const s = getStatus(c.estado);
-    document.getElementById('modalContent').innerHTML=`
-      <div class="modal-title">${c.nombre||'Sin nombre'}</div>
+    const row = (label, value, cls='') => value ? `<div class="detail-item${cls}"><div class="detail-label">${label}</div><div class="detail-value ${cls.includes('full')?'':''}${cls}">${value}</div></div>` : '';
+
+    document.getElementById('modalContent').innerHTML = `
+      <div class="modal-client">${c.cliente||'Sin nombre'}</div>
+      ${c.demandado ? `<div class="modal-rut">vs. ${c.demandado}</div>` : ''}
+      ${c.rut ? `<div class="modal-rut">RUT ${c.rut}</div>` : ''}
       <div class="modal-status" style="background:${s.bg};color:${s.color}">● ${c.estado||'Sin estado'}</div>
-      <div class="section-title">Datos de la causa</div>
+
+      <div class="section-label">Identificación</div>
       <div class="detail-grid">
-        <div class="detail-item"><div class="detail-label">N° Causa</div><div class="detail-value accent">${c.causa||'—'}</div></div>
-        <div class="detail-item"><div class="detail-label">Fecha</div><div class="detail-value">${c.fecha||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Rol</div><div class="detail-value accent">${c.rol||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Rol ICA</div><div class="detail-value accent">${c.rolica||'—'}</div></div>
         <div class="detail-item full"><div class="detail-label">Tribunal</div><div class="detail-value">${c.tribunal||'—'}</div></div>
-        ${c.monto?`<div class="detail-item full"><div class="detail-label">Monto</div><div class="detail-value money">${formatMonto(c.monto)}</div></div>`:''}
-        ${c.notas?`<div class="detail-item full"><div class="detail-label">Notas</div><div class="detail-value">${c.notas}</div></div>`:''}
-      </div>`;
+        <div class="detail-item full"><div class="detail-label">Materia</div><div class="detail-value">${c.materia||'—'}</div></div>
+      </div>
+
+      <div class="section-label">Seguimiento</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Etapa</div><div class="detail-value">${c.etapa||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Fecha Demanda</div><div class="detail-value">${formatFecha(c.fecha)||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Última Revisión</div><div class="detail-value">${c.revision||'—'}</div></div>
+        ${c.monto ? `<div class="detail-item"><div class="detail-label">Monto</div><div class="detail-value money">${formatMonto(c.monto)}</div></div>` : ''}
+      </div>
+
+      <div class="section-label">Equipo</div>
+      <div class="detail-grid">
+        <div class="detail-item full"><div class="detail-label">Abogado</div><div class="detail-value">${c.abogado||'—'}</div></div>
+        <div class="detail-item full"><div class="detail-label">Abogado Coordinador</div><div class="detail-value">${c.abog_coord||'—'}</div></div>
+      </div>
+
+      ${c.obs ? `<div class="section-label">Observaciones</div><div class="detail-grid"><div class="detail-item full"><div class="detail-label">Notas</div><div class="detail-value muted">${c.obs}</div></div></div>` : ''}
+    `;
     openModal('detailModal');
   }
 
-  function openModal(id){
-    // Pre-fill config modal
-    if(id==='configModal' && config){
+  function openModal(id) {
+    if (id === 'configModal' && config) {
       document.getElementById('scriptUrl').value = config.scriptUrl||'';
       document.getElementById('hasHeader').value = config.hasHeader||'1';
-      document.getElementById('col_nombre').value = config.col_nombre||'A';
-      document.getElementById('col_causa').value = config.col_causa||'B';
-      document.getElementById('col_tribunal').value = config.col_tribunal||'C';
-      document.getElementById('col_estado').value = config.col_estado||'D';
-      document.getElementById('col_fecha').value = config.col_fecha||'E';
-      document.getElementById('col_monto').value = config.col_monto||'F';
-      document.getElementById('col_notas').value = config.col_notas||'G';
+      ['rol','tribunal','rolica','cliente','demandado','rut','abog_coord','materia','monto','estado','fecha','etapa','revision','abogado','obs'].forEach(k => {
+        const el = document.getElementById('col_'+k);
+        if (el) el.value = config['col_'+k]||'';
+      });
     }
     document.getElementById(id).classList.add('open');
-    document.body.style.overflow='hidden';
+    document.body.style.overflow = 'hidden';
   }
-  function closeModal(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
-  function bgClose(e,id){ if(e.target===e.currentTarget)closeModal(id); }
 
-  function saveAndLoad(){
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+  function bgClose(e, id) { if (e.target === e.currentTarget) closeModal(id); }
+
+  function saveAndLoad() {
     const scriptUrl = document.getElementById('scriptUrl').value.trim();
-    if(!scriptUrl){alert('Ingresa la URL del script');return;}
+    if (!scriptUrl) { alert('Ingresa la URL del script'); return; }
     config = {
       scriptUrl,
       hasHeader: document.getElementById('hasHeader').value,
-      col_nombre:   document.getElementById('col_nombre').value||'A',
-      col_causa:    document.getElementById('col_causa').value||'B',
-      col_tribunal: document.getElementById('col_tribunal').value||'C',
-      col_estado:   document.getElementById('col_estado').value||'D',
-      col_fecha:    document.getElementById('col_fecha').value||'E',
-      col_monto:    document.getElementById('col_monto').value||'F',
-      col_notas:    document.getElementById('col_notas').value||'G',
+      col_rol:        document.getElementById('col_rol').value||'A',
+      col_tribunal:   document.getElementById('col_tribunal').value||'B',
+      col_rolica:     document.getElementById('col_rolica').value||'C',
+      col_cliente:    document.getElementById('col_cliente').value||'E',
+      col_demandado:  document.getElementById('col_demandado').value||'F',
+      col_rut:        document.getElementById('col_rut').value||'G',
+      col_abog_coord: document.getElementById('col_abog_coord').value||'H',
+      col_materia:    document.getElementById('col_materia').value||'I',
+      col_monto:      document.getElementById('col_monto').value||'J',
+      col_estado:     document.getElementById('col_estado').value||'K',
+      col_fecha:      document.getElementById('col_fecha').value||'L',
+      col_etapa:      document.getElementById('col_etapa').value||'O',
+      col_revision:   document.getElementById('col_revision').value||'P',
+      col_abogado:    document.getElementById('col_abogado').value||'Q',
+      col_obs:        document.getElementById('col_obs').value||'R',
     };
-    localStorage.setItem('causas_script_cfg', JSON.stringify(config));
+    localStorage.setItem('causas_v4', JSON.stringify(config));
     closeModal('configModal');
     loadSheetData(config);
   }
 
-  function showLoading(){ document.getElementById('mainContent').innerHTML=`<div class="state-box"><div class="spinner"></div><h3>Cargando causas…</h3><p>Conectando con Google Sheets</p></div>`; }
-  function showError(e){ document.getElementById('mainContent').innerHTML=`<div class="state-box"><div class="icon">⚠️</div><h3>Error al cargar</h3><p>${e.message}</p><br><button class="btn-icon" style="margin:0 auto" onclick="openModal('configModal')">⚙️ Configurar</button></div>`; }
+  function showLoading() { document.getElementById('mainContent').innerHTML = `<div class="state-box"><div class="spinner"></div><h3>Cargando causas…</h3><p>Conectando con Google Sheets</p></div>`; }
+  function showError(e) { document.getElementById('mainContent').innerHTML = `<div class="state-box"><div class="icon">⚠️</div><h3>Error al cargar</h3><p>${e.message}</p><br><button class="btn-icon" style="margin:0 auto" onclick="openModal('configModal')">⚙️ Configurar</button></div>`; }
 
-  // Cargar al iniciar
   loadSheetData(config);
 </script>
 </body>
