@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Causas" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Causas Judiciales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b1220; --surface: #111c2d; --surface2: #172236; --border: #1e3050;
+      --accent: #2dd4bf; --accent2: #f59e0b; --text: #e2eaf5; --muted: #64748b;
+      --font-display: 'Syne', sans-serif; --font-mono: 'DM Mono', monospace;
+      --radius: 12px; --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-display); overflow-x: hidden; }
+    body { display: flex; flex-direction: column; min-height: 100dvh; }
+
+    header { padding: calc(16px + var(--safe-top)) 20px 16px; position: sticky; top: 0; z-index: 100; background: rgba(11,18,32,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), #0ea5e9); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .logo-text span { color: var(--accent); }
+    .header-actions { display: flex; gap: 8px; }
+    .btn-icon { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 10px; padding: 8px 12px; font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .btn-icon:active { opacity: 0.7; }
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    #searchInput { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 12px 12px 40px; color: var(--text); font-family: var(--font-display); font-size: 15px; outline: none; }
+    #searchInput:focus { border-color: var(--accent); }
+    #searchInput::placeholder { color: var(--muted); }
+
+    .stats-bar { display: flex; gap: 8px; padding: 12px 16px 4px; overflow-x: auto; scrollbar-width: none; }
+    .stats-bar::-webkit-scrollbar { display: none; }
+    .stat-chip { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .stat-chip.active { background: var(--accent); border-color: var(--accent); color: #0b1220; }
+    .stat-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .count-badge { font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 100px; background: rgba(0,0,0,0.15); }
+
+    .filter-row { display: flex; gap: 8px; padding: 10px 16px 14px; overflow-x: auto; scrollbar-width: none; }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-btn { flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; color: var(--muted); font-family: var(--font-display); font-size: 12px; font-weight: 600; cursor: pointer; }
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); }
+
+    main { flex: 1; padding: 16px 16px calc(20px + var(--safe-bottom)); }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; cursor: pointer; position: relative; overflow: hidden; }
+    .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--status-color, var(--muted)); }
+    .card:active { opacity: 0.8; }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .card-name { font-size: 15px; font-weight: 700; flex: 1; padding-right: 10px; line-height: 1.3; }
+    .status-badge { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .meta-value { font-size: 13px; color: var(--text); }
+    .meta-value.mono { font-family: var(--font-mono); font-size: 12px; }
+    .card-footer { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .monto { font-size: 15px; font-weight: 700; font-family: var(--font-mono); color: var(--accent2); }
+    .fecha { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+
+    .state-box { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .state-box .icon { font-size: 48px; margin-bottom: 16px; }
+    .state-box h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .state-box p { font-size: 14px; line-height: 1.6; }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + var(--safe-bottom)); width: 100%; max-height: 88dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32,0.72,0,1); }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+    .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; line-height: 1.3; }
+    .modal-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 100px; margin-bottom: 20px; }
+    .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .detail-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+    .detail-item.full { grid-column: 1 / -1; }
+    .detail-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .detail-value { font-size: 14px; font-weight: 600; color: var(--text); word-break: break-word; }
+    .detail-value.accent { color: var(--accent); font-family: var(--font-mono); }
+    .detail-value.money { color: var(--accent2); font-family: var(--font-mono); font-size: 18px; }
+    .btn-close { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; color: var(--muted); font-family: var(--font-display); font-size: 15px; font-weight: 600; cursor: pointer; }
+
+    /* Config modal */
+    .config-body { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + var(--safe-bottom)); width: 100%; max-height: 92dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32,0.72,0,1); }
+    .modal-overlay.open .config-body { transform: translateY(0); }
+    .config-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .config-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+    .input-group { margin-bottom: 16px; }
+    .input-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px; display: block; }
+    .text-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 14px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; }
+    .text-input:focus { border-color: var(--accent); }
+    .text-input::placeholder { color: var(--muted); font-size: 11px; }
+    .btn-primary { width: 100%; background: var(--accent); border: none; border-radius: var(--radius); padding: 15px; color: #0b1220; font-family: var(--font-display); font-size: 15px; font-weight: 800; cursor: pointer; margin-bottom: 10px; }
+    .hint-box { background: rgba(45,212,191,0.07); border: 1px solid rgba(45,212,191,0.2); border-radius: var(--radius); padding: 14px; margin-bottom: 20px; }
+    .hint-box p { font-size: 12px; color: #7de8da; line-height: 1.7; }
+    .divider { height: 1px; background: var(--border); margin: 18px 0; }
+    .col-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .col-lbl { font-size: 12px; color: var(--muted); width: 95px; flex-shrink: 0; }
+    .col-in { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; }
+    .col-in:focus { border-color: var(--accent); }
+
+    .connected-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #10b981; font-weight: 600; }
+    .connected-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">⚖️</div>
+      <div class="logo-text">Causas<span>.</span></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="recargar()" title="Actualizar datos">🔄</button>
+      <button class="btn-icon" onclick="openModal('configModal')">⚙️</button>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="search" id="searchInput" placeholder="Buscar causa, RUT, tribunal…" oninput="filterCausas()" />
+  </div>
+</header>
+
+<div class="stats-bar" id="statsBar"></div>
+<div class="filter-row" id="filterRow"></div>
+
+<main id="mainContent">
+  <div class="state-box">
+    <div class="spinner"></div>
+    <h3>Cargando causas…</h3>
+    <p>Conectando con Google Sheets</p>
+  </div>
+</main>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal" onclick="bgClose(event,'detailModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="modalContent"></div>
+    <button class="btn-close" onclick="closeModal('detailModal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- Config Modal -->
+<div class="modal-overlay" id="configModal" onclick="bgClose(event,'configModal')">
+  <div class="config-body">
+    <div class="modal-handle"></div>
+    <div class="config-title">Configuración</div>
+    <p class="config-sub">Ajusta la URL del script y el mapeo de columnas de tu planilla.</p>
+
+    <div class="hint-box">
+      <p>La URL del Apps Script se ve así:<br>
+      <strong>https://script.google.com/macros/s/…/exec</strong></p>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">URL del Apps Script</label>
+      <input type="url" class="text-input" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" />
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">¿La primera fila tiene encabezados?</label>
+      <select class="text-input" id="hasHeader">
+        <option value="1">Sí — saltar primera fila</option>
+        <option value="0">No — leer desde fila 1</option>
+      </select>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="input-group">
+      <label class="input-label" style="margin-bottom:12px">Mapeo de columnas (letra o número)</label>
+      <div class="col-row"><span class="col-lbl">Nombre / RUT</span><input class="col-in" id="col_nombre" placeholder="A" /></div>
+      <div class="col-row"><span class="col-lbl">N° Causa</span><input class="col-in" id="col_causa" placeholder="B" /></div>
+      <div class="col-row"><span class="col-lbl">Tribunal</span><input class="col-in" id="col_tribunal" placeholder="C" /></div>
+      <div class="col-row"><span class="col-lbl">Estado</span><input class="col-in" id="col_estado" placeholder="D" /></div>
+      <div class="col-row"><span class="col-lbl">Fecha</span><input class="col-in" id="col_fecha" placeholder="E" /></div>
+      <div class="col-row"><span class="col-lbl">Monto</span><input class="col-in" id="col_monto" placeholder="F" /></div>
+      <div class="col-row"><span class="col-lbl">Notas / Otros</span><input class="col-in" id="col_notas" placeholder="G" /></div>
+    </div>
+
+    <button class="btn-primary" onclick="saveAndLoad()">✅ Guardar y cargar datos</button>
+    <button class="btn-close" onclick="closeModal('configModal')">Cancelar</button>
+  </div>
+</div>
+
+<script>
+  // URL del Apps Script ya configurada
+  const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEYlOVMI5t32mkMPim7Eu4J9tbHHuL7etbpxwH_puUBr-1rqRXW_KYdRuzVnCa2kBHmg/exec';
+
+  let allCausas = [], activeFilter = 'all', activeTribunal = null;
+  let config = JSON.parse(localStorage.getItem('causas_script_cfg') || 'null');
+
+  // Si no hay config guardada, usar defaults con la URL ya configurada
+  if (!config) {
+    config = {
+      scriptUrl: DEFAULT_SCRIPT_URL,
+      hasHeader: '1',
+      col_nombre: 'A', col_causa: 'B', col_tribunal: 'C',
+      col_estado: 'D', col_fecha: 'E', col_monto: 'F', col_notas: 'G'
+    };
+  }
+
+  const STATUS_MAP = {
+    'activo':    {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
+    'vigente':   {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
+    'pendiente': {color:'#f59e0b',bg:'rgba(245,158,11,0.12)'},
+    'en tramite':{color:'#3b82f6',bg:'rgba(59,130,246,0.12)'},
+    'en trámite':{color:'#3b82f6',bg:'rgba(59,130,246,0.12)'},
+    'suspendido':{color:'#f43f5e',bg:'rgba(244,63,94,0.12)'},
+    'cerrado':   {color:'#64748b',bg:'rgba(100,116,139,0.12)'},
+    'terminado': {color:'#64748b',bg:'rgba(100,116,139,0.12)'},
+  };
+  const DEF = {color:'#64748b',bg:'rgba(100,116,139,0.12)'};
+  function getStatus(e){if(!e)return DEF;const k=e.toLowerCase().trim();for(const[key,v]of Object.entries(STATUS_MAP))if(k.includes(key))return v;return DEF;}
+
+  function colIdx(v){if(!v)return -1;v=v.toString().trim();if(/^\d+$/.test(v))return parseInt(v)-1;return v.toUpperCase().charCodeAt(0)-65;}
+
+  async function loadSheetData(cfg) {
+    showLoading();
+    try {
+      const res = await fetch(cfg.scriptUrl);
+      if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
+      const raw = await res.json();
+      if (!Array.isArray(raw)) throw new Error('Formato inesperado de datos');
+      const start = cfg.hasHeader === '1' ? 1 : 0;
+      allCausas = raw.slice(start).map((row, i) => ({
+        id: i,
+        nombre:   String(row[colIdx(cfg.col_nombre  ||'A')]||''),
+        causa:    String(row[colIdx(cfg.col_causa   ||'B')]||''),
+        tribunal: String(row[colIdx(cfg.col_tribunal||'C')]||''),
+        estado:   String(row[colIdx(cfg.col_estado  ||'D')]||''),
+        fecha:    String(row[colIdx(cfg.col_fecha   ||'E')]||''),
+        monto:    String(row[colIdx(cfg.col_monto   ||'F')]||''),
+        notas:    String(row[colIdx(cfg.col_notas   ||'G')]||''),
+      })).filter(c => c.nombre || c.causa);
+      renderAll();
+    } catch(e) {
+      showError(e);
+    }
+  }
+
+  function recargar() {
+    if (config) loadSheetData(config);
+  }
+
+  function renderAll() { buildStats(); buildFilters(); filterCausas(); }
+
+  function buildStats() {
+    const bar = document.getElementById('statsBar');
+    const estados = {};
+    allCausas.forEach(c => { const e = c.estado||'Sin estado'; estados[e]=(estados[e]||0)+1; });
+    let html = `<div class="stat-chip active" onclick="setEstado('all',this)"><span class="dot"></span>Todas <span class="count-badge">${allCausas.length}</span></div>`;
+    Object.entries(estados).forEach(([e,n]) => {
+      const s = getStatus(e);
+      html += `<div class="stat-chip" style="color:${s.color}" onclick="setEstado('${e.replace(/'/g,"\\'")}',this)"><span class="dot"></span>${e} <span class="count-badge">${n}</span></div>`;
+    });
+    bar.innerHTML = html;
+  }
+
+  function buildFilters() {
+    const row = document.getElementById('filterRow');
+    const tribunales = [...new Set(allCausas.map(c=>c.tribunal).filter(Boolean))];
+    let html = `<button class="filter-btn active" onclick="setTribunal(null,this)">Todos</button>`;
+    tribunales.forEach(t => { html += `<button class="filter-btn" onclick="setTribunal('${t.replace(/'/g,"\\'")}',this)">${t}</button>`; });
+    row.innerHTML = html;
+  }
+
+  function setEstado(val,el){
+    activeFilter=val;
+    document.querySelectorAll('.stat-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    filterCausas();
+  }
+
+  function setTribunal(val,el){
+    activeTribunal=val;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    filterCausas();
+  }
+
+  function filterCausas(){
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allCausas.filter(c => {
+      const matchQ = !q || [c.nombre,c.causa,c.tribunal,c.estado,c.notas].join(' ').toLowerCase().includes(q);
+      const matchE = activeFilter==='all' || c.estado===activeFilter;
+      const matchT = !activeTribunal || c.tribunal===activeTribunal;
+      return matchQ && matchE && matchT;
+    });
+    renderCards(filtered);
+  }
+
+  function renderCards(list){
+    const main = document.getElementById('mainContent');
+    if (!list.length) {
+      main.innerHTML = `<div class="state-box"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Intenta con otro término o filtro.</p></div>`;
+      return;
+    }
+    main.innerHTML = list.map(c => {
+      const s = getStatus(c.estado);
+      return `<div class="card" style="--status-color:${s.color}" onclick="openDetail(${c.id})">
+        <div class="card-header">
+          <div class="card-name">${c.nombre||'—'}</div>
+          <div class="status-badge" style="background:${s.bg};color:${s.color}">${c.estado||'Sin estado'}</div>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item"><span class="meta-label">N° Causa</span><span class="meta-value mono">${c.causa||'—'}</span></div>
+          <div class="meta-item"><span class="meta-label">Tribunal</span><span class="meta-value">${c.tribunal||'—'}</span></div>
+        </div>
+        ${(c.monto||c.fecha)?`<div class="card-footer"><span class="monto">${c.monto?formatMonto(c.monto):''}</span><span class="fecha">${c.fecha||''}</span></div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  function formatMonto(m){
+    if(!m)return'';
+    const n=parseFloat(m.toString().replace(/[^0-9.-]/g,''));
+    if(isNaN(n))return m;
+    return'$'+n.toLocaleString('es-CL');
+  }
+
+  function openDetail(id){
+    const c = allCausas.find(x=>x.id===id); if(!c)return;
+    const s = getStatus(c.estado);
+    document.getElementById('modalContent').innerHTML=`
+      <div class="modal-title">${c.nombre||'Sin nombre'}</div>
+      <div class="modal-status" style="background:${s.bg};color:${s.color}">● ${c.estado||'Sin estado'}</div>
+      <div class="section-title">Datos de la causa</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">N° Causa</div><div class="detail-value accent">${c.causa||'—'}</div></div>
+        <div class="detail-item"><div class="detail-label">Fecha</div><div class="detail-value">${c.fecha||'—'}</div></div>
+        <div class="detail-item full"><div class="detail-label">Tribunal</div><div class="detail-value">${c.tribunal||'—'}</div></div>
+        ${c.monto?`<div class="detail-item full"><div class="detail-label">Monto</div><div class="detail-value money">${formatMonto(c.monto)}</div></div>`:''}
+        ${c.notas?`<div class="detail-item full"><div class="detail-label">Notas</div><div class="detail-value">${c.notas}</div></div>`:''}
+      </div>`;
+    openModal('detailModal');
+  }
+
+  function openModal(id){
+    // Pre-fill config modal
+    if(id==='configModal' && config){
+      document.getElementById('scriptUrl').value = config.scriptUrl||'';
+      document.getElementById('hasHeader').value = config.hasHeader||'1';
+      document.getElementById('col_nombre').value = config.col_nombre||'A';
+      document.getElementById('col_causa').value = config.col_causa||'B';
+      document.getElementById('col_tribunal').value = config.col_tribunal||'C';
+      document.getElementById('col_estado').value = config.col_estado||'D';
+      document.getElementById('col_fecha').value = config.col_fecha||'E';
+      document.getElementById('col_monto').value = config.col_monto||'F';
+      document.getElementById('col_notas').value = config.col_notas||'G';
+    }
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+  function bgClose(e,id){ if(e.target===e.currentTarget)closeModal(id); }
+
+  function saveAndLoad(){
+    const scriptUrl = document.getElementById('scriptUrl').value.trim();
+    if(!scriptUrl){alert('Ingresa la URL del script');return;}
+    config = {
+      scriptUrl,
+      hasHeader: document.getElementById('hasHeader').value,
+      col_nombre:   document.getElementById('col_nombre').value||'A',
+      col_causa:    document.getElementById('col_causa').value||'B',
+      col_tribunal: document.getElementById('col_tribunal').value||'C',
+      col_estado:   document.getElementById('col_estado').value||'D',
+      col_fecha:    document.getElementById('col_fecha').value||'E',
+      col_monto:    document.getElementById('col_monto').value||'F',
+      col_notas:    document.getElementById('col_notas').value||'G',
+    };
+    localStorage.setItem('causas_script_cfg', JSON.stringify(config));
+    closeModal('configModal');
+    loadSheetData(config);
+  }
+
+  function showLoading(){ document.getElementById('mainContent').innerHTML=`<div class="state-box"><div class="spinner"></div><h3>Cargando causas…</h3><p>Conectando con Google Sheets</p></div>`; }
+  function showError(e){ document.getElementById('mainContent').innerHTML=`<div class="state-box"><div class="icon">⚠️</div><h3>Error al cargar</h3><p>${e.message}</p><br><button class="btn-icon" style="margin:0 auto" onclick="openModal('configModal')">⚙️ Configurar</button></div>`; }
+
+  // Cargar al iniciar
+  loadSheetData(config);
+</script>
+</body>
+</html>
