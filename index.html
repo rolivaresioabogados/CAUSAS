@@ -22,7 +22,7 @@
     body { display: flex; flex-direction: column; min-height: 100dvh; }
 
     header {
-      padding: calc(16px + var(--safe-top)) 20px 16px;
+      padding: calc(16px + var(--safe-top)) 20px 0;
       position: sticky; top: 0; z-index: 100;
       background: rgba(11,18,32,0.97);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -135,10 +135,9 @@
     <span class="search-icon">🔍</span>
     <input type="search" id="searchInput" placeholder="Buscar cliente, RUT, rol, abogado…" oninput="filterCausas()" />
   </div>
+  <div class="stats-bar" id="statsBar"></div>
+  <div class="filter-row" id="filterRow"></div>
 </header>
-
-<div class="stats-bar" id="statsBar"></div>
-<div class="filter-row" id="filterRow"></div>
 
 <main id="mainContent">
   <div class="state-box">
