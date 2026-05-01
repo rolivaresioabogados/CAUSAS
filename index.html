@@ -220,7 +220,7 @@
 </div>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEYlOVMI5t32mkMPim7Eu4J9tbHHuL7etbpxwH_puUBr-1rqRXW_KYdRuzVnCa2kBHmg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKtxI7sZcGGqdVf9fSdHd3Mui1VKMOUJecI8q4W8O_BQhO8RGbye1On38oc6YOZHdoKg/exec';
 
   const DEFAULT_CFG = {
     scriptUrl: SCRIPT_URL,
@@ -266,7 +266,8 @@
   async function loadSheetData(cfg) {
     showLoading();
     try {
-      const res = await fetch(cfg.scriptUrl);
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(cfg.scriptUrl)}`;
+      const res = await fetch(proxyUrl);
       if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
       const raw = await res.json();
       if (!Array.isArray(raw)) throw new Error('Formato inesperado');
