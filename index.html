@@ -43,14 +43,14 @@
     #searchInput:focus { border-color: var(--accent); }
     #searchInput::placeholder { color: var(--muted); }
 
-    .stats-bar { display: flex; gap: 10px; padding: 20px 16px 12px; overflow-x: auto; scrollbar-width: none; }
+    .stats-bar { display: flex; gap: 10px; padding: 20px 16px 12px; overflow-x: auto; scrollbar-width: none; background: var(--bg); }
     .stats-bar::-webkit-scrollbar { display: none; }
     .stat-chip { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; min-height: 48px; }
     .stat-chip.active { background: var(--accent); border-color: var(--accent); color: #0b1220; }
     .stat-chip .dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
     .count-badge { font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 100px; background: rgba(0,0,0,0.15); }
 
-    .filter-row { display: flex; gap: 8px; padding: 8px 16px 20px; overflow-x: auto; scrollbar-width: none; }
+    .filter-row { display: flex; gap: 8px; padding: 0 16px 16px; overflow-x: auto; scrollbar-width: none; background: var(--bg); }
     .filter-row::-webkit-scrollbar { display: none; }
     .filter-btn { flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; color: var(--muted); font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; min-height: 42px; }
     .filter-btn.active { border-color: var(--accent); color: var(--accent); }
@@ -135,9 +135,10 @@
     <span class="search-icon">🔍</span>
     <input type="search" id="searchInput" placeholder="Buscar cliente, RUT, rol, abogado…" oninput="filterCausas()" />
   </div>
-  <div class="stats-bar" id="statsBar"></div>
-  <div class="filter-row" id="filterRow"></div>
 </header>
+
+<div class="stats-bar" id="statsBar" style="position:sticky;top:var(--header-h,88px);z-index:99;"></div>
+<div class="filter-row" id="filterRow" style="position:sticky;top:var(--header-h2,140px);z-index:98;"></div>
 
 <main id="mainContent">
   <div class="state-box">
