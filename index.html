@@ -454,11 +454,14 @@ function updateAbogadoCounts() {
   document.querySelectorAll('#abogadoBar .abog-btn').forEach(btn => {
     const nEl = btn.querySelector('.n');
     if (!nEl) return;
+    let count;
     if (btn.dataset.key==='all') {
-      nEl.textContent = allCausas.filter(preFilter).length;
+      count = allCausas.filter(preFilter).length;
     } else {
-      nEl.textContent = allCausas.filter(c => preFilter(c) && c.abogado===btn.dataset.abogado).length;
+      count = allCausas.filter(c => preFilter(c) && c.abogado===btn.dataset.abogado).length;
     }
+    nEl.textContent = count;
+    btn.style.display = (btn.dataset.key==='all' || count > 0) ? '' : 'none';
   });
 }
 
