@@ -233,6 +233,8 @@
       <div class="cr"><span class="cl">Monto</span><input class="ci" id="col_monto" placeholder="J" /></div>
       <div class="cr"><span class="cl">Estado</span><input class="ci" id="col_estado" placeholder="K" /></div>
       <div class="cr"><span class="cl">Fecha Demanda</span><input class="ci" id="col_fecha" placeholder="L" /></div>
+      <div class="cr"><span class="cl">Fecha Notificación</span><input class="ci" id="col_notif" placeholder="M" /></div>
+      <div class="cr"><span class="cl">Fecha Embargo</span><input class="ci" id="col_embargo" placeholder="N" /></div>
       <div class="cr"><span class="cl">Etapa</span><input class="ci" id="col_etapa" placeholder="O" /></div>
       <div class="cr"><span class="cl">Última Revisión</span><input class="ci" id="col_revision" placeholder="P" /></div>
       <div class="cr"><span class="cl">Abogado</span><input class="ci" id="col_abogado" placeholder="Q" /></div>
@@ -249,7 +251,8 @@ const DEFAULT_CFG = {
   hasHeader:'1', col_rol:'A', col_tribunal:'B', col_rolica:'C',
   col_cliente:'E', col_demandado:'F', col_rut:'G', col_abog_coord:'H',
   col_materia:'I', col_monto:'J', col_estado:'K', col_fecha:'L',
-  col_etapa:'O', col_revision:'P', col_abogado:'Q', col_obs:'R'
+  col_notif:'M', col_embargo:'N', col_etapa:'O', col_revision:'P',
+  col_abogado:'Q', col_obs:'R'
 };
 
 let allCausas = [];
@@ -326,6 +329,7 @@ async function loadData() {
       monto:gcv(row,config.col_monto), estado:gcv(row,config.col_estado),
       fecha:gcv(row,config.col_fecha), etapa:gcv(row,config.col_etapa),
       revision:gcv(row,config.col_revision), abogado:gcv(row,config.col_abogado),
+      notif:gcv(row,config.col_notif), embargo:gcv(row,config.col_embargo),
       obs:gcv(row,config.col_obs),
     })).filter(c => c.cliente||c.rol||c.demandado);
 
@@ -515,22 +519,27 @@ function openDetail(id) {
     <div class="dgrid">
       <div class="di"><div class="di-label">Rol</div><div class="di-val ac">${c.rol||'—'}</div></div>
       <div class="di"><div class="di-label">Rol ICA</div><div class="di-val pu">${c.rolica||'—'}</div></div>
-      <div class="di full"><div class="di-label">Tribunal</div><div class="di-val">${c.tribunal||'—'}</div></div>
-      <div class="di full"><div class="di-label">Materia</div><div class="di-val">${c.materia||'—'}</div></div>
+      <div class="di"><div class="di-label">Tribunal</div><div class="di-val">${c.tribunal||'—'}</div></div>
+      <div class="di"><div class="di-label">Materia</div><div class="di-val">${c.materia||'—'}</div></div>
     </div>
     <div class="sec-label">Seguimiento</div>
     <div class="dgrid">
       <div class="di"><div class="di-label">Etapa</div><div class="di-val">${c.etapa||'—'}</div></div>
       <div class="di"><div class="di-label">Fecha Demanda</div><div class="di-val">${formatFecha(c.fecha)||'—'}</div></div>
-      <div class="di"><div class="di-label">Última Revisión</div><div class="di-val">${formatFecha(c.revision)||'—'}</div></div>
-      ${c.monto?`<div class="di"><div class="di-label">Monto</div><div class="di-val mo">${formatMonto(c.monto)}</div></div>`:''}
+      <div class="di"><div class="di-label">Fecha Notificación</div><div class="di-val">${formatFecha(c.notif)||'—'}</div></div>
+      <div class="di"><div class="di-label">Fecha Embargo</div><div class="di-val">${formatFecha(c.embargo)||'—'}</div></div>
+      ${c.monto?`<div class="di full"><div class="di-label">Monto</div><div class="di-val mo">${formatMonto(c.monto)}</div></div>`:''}
     </div>
     <div class="sec-label">Equipo</div>
     <div class="dgrid">
-      <div class="di full"><div class="di-label">Abogado</div><div class="di-val">${c.abogado||'—'}</div></div>
-      <div class="di full"><div class="di-label">Abogado Coordinador</div><div class="di-val">${c.abog_coord||'—'}</div></div>
+      <div class="di"><div class="di-label">Abogado</div><div class="di-val">${c.abogado||'—'}</div></div>
+      <div class="di"><div class="di-label">Abogado Coordinador</div><div class="di-val">${c.abog_coord||'—'}</div></div>
     </div>
-    ${c.obs?`<div class="sec-label">Observaciones</div><div class="dgrid"><div class="di full"><div class="di-label">Notas</div><div class="di-val mu">${c.obs}</div></div></div>`:''}
+    <div class="sec-label">Observaciones y Revisión</div>
+    <div class="dgrid">
+      <div class="di"><div class="di-label">Última Revisión</div><div class="di-val">${formatFecha(c.revision)||'—'}</div></div>
+      ${c.obs?`<div class="di"><div class="di-label">Notas</div><div class="di-val mu">${c.obs}</div></div>`:'<div class="di"><div class="di-label">Notas</div><div class="di-val mu">—</div></div>'}
+    </div>
   `;
   document.getElementById('detailOverlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -546,7 +555,7 @@ document.getElementById('btnCloseConfig').addEventListener('click', ()=>closeOve
 document.getElementById('btnReload').addEventListener('click', loadData);
 document.getElementById('btnConfig').addEventListener('click', () => {
   document.getElementById('hasHeader').value = config.hasHeader||'1';
-  ['rol','tribunal','rolica','cliente','demandado','rut','abog_coord','materia','monto','estado','fecha','etapa','revision','abogado','obs'].forEach(k => {
+  ['rol','tribunal','rolica','cliente','demandado','rut','abog_coord','materia','monto','estado','fecha','notif','embargo','etapa','revision','abogado','obs'].forEach(k => {
     const el = document.getElementById('col_'+k); if(el) el.value = config['col_'+k]||'';
   });
   document.getElementById('configOverlay').classList.add('open');
@@ -567,6 +576,8 @@ document.getElementById('btnSaveConfig').addEventListener('click', () => {
     col_monto:document.getElementById('col_monto').value||'J',
     col_estado:document.getElementById('col_estado').value||'K',
     col_fecha:document.getElementById('col_fecha').value||'L',
+    col_notif:document.getElementById('col_notif').value||'M',
+    col_embargo:document.getElementById('col_embargo').value||'N',
     col_etapa:document.getElementById('col_etapa').value||'O',
     col_revision:document.getElementById('col_revision').value||'P',
     col_abogado:document.getElementById('col_abogado').value||'Q',
