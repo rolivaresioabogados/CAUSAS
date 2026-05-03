@@ -175,6 +175,7 @@
     </div>
     <div class="header-actions">
       <button class="btn-icon" id="btnReload">🔄</button>
+      <button class="btn-icon" id="btnChart">📊</button>
       <button class="btn-icon" id="btnConfig">⚙️</button>
     </div>
   </div>
@@ -206,8 +207,19 @@
   </div>
 </div>
 
-<!-- CONFIG -->
-<div class="overlay" id="configOverlay">
+<!-- CHARTS -->
+<div class="overlay" id="chartOverlay">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px">Resumen por Estado</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px" id="chartTotal"></div>
+    <canvas id="chartCanvas" style="width:100%;max-height:300px"></canvas>
+    <div id="chartLegend" style="margin-top:20px;display:flex;flex-direction:column;gap:8px"></div>
+    <button class="btn-close" id="btnCloseChart" style="margin-top:20px">Cerrar</button>
+  </div>
+</div>
+
+
   <div class="sheet">
     <div class="handle"></div>
     <div class="cfg-title">Configuración</div>
@@ -555,7 +567,96 @@ document.getElementById('configOverlay').addEventListener('click', e=>{ if(e.tar
 document.getElementById('btnCloseDetail').addEventListener('click', ()=>closeOverlay('detailOverlay'));
 document.getElementById('btnCloseConfig').addEventListener('click', ()=>closeOverlay('configOverlay'));
 
-document.getElementById('btnReload').addEventListener('click', loadData);
+document.getElementById('btnChart').addEventListener('click', () => {
+  openChart();
+});
+document.getElementById('btnCloseChart').addEventListener('click', () => closeOverlay('chartOverlay'));
+document.getElementById('chartOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeOverlay('chartOverlay'); });
+
+function openChart() {
+  const filtered = getFiltered();
+  const estados = {};
+  filtered.forEach(c => { const e = c.estado||'Sin estado'; estados[e]=(estados[e]||0)+1; });
+  const labels = Object.keys(estados);
+  const values = Object.values(estados);
+  const total = values.reduce((a,b)=>a+b,0);
+
+  // Colores por estado
+  const COLORS = ['#10b981','#f59e0b','#3b82f6','#f43f5e','#64748b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316'];
+  const colors = labels.map((l,i) => {
+    const s = getStatus(l);
+    return s.color !== '#64748b' ? s.color : COLORS[i % COLORS.length];
+  });
+
+  const hayFiltros = selEstados.size > 0 || selICA || selAbogado || document.getElementById('searchInput').value;
+  document.getElementById('chartTotal').textContent = `${hayFiltros ? 'Filtrado: ' : 'Total: '}${total} causas`;
+
+  // Dibujar torta en canvas
+  const canvas = document.getElementById('chartCanvas');
+  const size = Math.min(window.innerWidth - 80, 280);
+  canvas.width = size;
+  canvas.height = size;
+  canvas.style.display = 'block';
+  canvas.style.margin = '0 auto';
+
+  const ctx = canvas.getContext('2d');
+  const cx = size/2, cy = size/2, r = size/2 - 10;
+  let startAngle = -Math.PI/2;
+
+  values.forEach((val, i) => {
+    const slice = (val/total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle+slice);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    ctx.strokeStyle = '#0b1220';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    startAngle += slice;
+  });
+
+  // Círculo interior (donut)
+  ctx.beginPath();
+  ctx.arc(cx, cy, r*0.55, 0, 2*Math.PI);
+  ctx.fillStyle = '#111c2d';
+  ctx.fill();
+
+  // Texto central
+  ctx.fillStyle = '#e2eaf5';
+  ctx.font = `bold ${size*0.12}px Calibri, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(total, cx, cy-8);
+  ctx.font = `${size*0.07}px Calibri, sans-serif`;
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('causas', cx, cy+12);
+
+  // Leyenda
+  const legend = document.getElementById('chartLegend');
+  legend.innerHTML = '';
+  labels.forEach((label, i) => {
+    const pct = ((values[i]/total)*100).toFixed(1);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;';
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:12px;height:12px;border-radius:3px;background:${colors[i]};flex-shrink:0"></div>
+        <span style="font-size:13px;font-weight:600">${label}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:var(--muted)">${pct}%</span>
+        <span style="font-size:14px;font-weight:700;color:${colors[i]}">${values[i]}</span>
+      </div>`;
+    legend.appendChild(row);
+  });
+
+  document.getElementById('chartOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+
 document.getElementById('btnConfig').addEventListener('click', () => {
   document.getElementById('hasHeader').value = config.hasHeader||'1';
   ['rol','tribunal','rolica','cliente','demandado','rut','abog_coord','materia','monto','estado','fecha','notif','embargo','etapa','revision','abogado','obs'].forEach(k => {
