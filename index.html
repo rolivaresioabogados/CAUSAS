@@ -237,8 +237,8 @@
       <div class="cr"><span class="cl">Fecha Embargo</span><input class="ci" id="col_embargo" placeholder="N" /></div>
       <div class="cr"><span class="cl">Etapa</span><input class="ci" id="col_etapa" placeholder="O" /></div>
       <div class="cr"><span class="cl">Última Revisión</span><input class="ci" id="col_revision" placeholder="P" /></div>
-      <div class="cr"><span class="cl">Abogado</span><input class="ci" id="col_abogado" placeholder="Q" /></div>
-      <div class="cr"><span class="cl">Observaciones</span><input class="ci" id="col_obs" placeholder="R" /></div>
+      <div class="cr"><span class="cl">Abogado</span><input class="ci" id="col_abogado" placeholder="R" /></div>
+      <div class="cr"><span class="cl">Observaciones</span><input class="ci" id="col_obs" placeholder="S" /></div>
     </div>
     <button class="btn-primary" id="btnSaveConfig">✅ Guardar</button>
     <button class="btn-close" id="btnCloseConfig">Cancelar</button>
@@ -252,7 +252,7 @@ const DEFAULT_CFG = {
   col_cliente:'E', col_demandado:'F', col_rut:'G', col_abog_coord:'H',
   col_materia:'I', col_monto:'J', col_estado:'K', col_fecha:'L',
   col_notif:'M', col_embargo:'N', col_etapa:'O', col_revision:'P',
-  col_abogado:'Q', col_obs:'R'
+  col_abogado:'R', col_obs:'S'
 };
 
 let allCausas = [];
@@ -524,11 +524,10 @@ function openDetail(id) {
     </div>
     <div class="sec-label">Seguimiento</div>
     <div class="dgrid">
-      <div class="di"><div class="di-label">Etapa</div><div class="di-val">${c.etapa||'—'}</div></div>
       <div class="di"><div class="di-label">Fecha Demanda</div><div class="di-val">${formatFecha(c.fecha)||'—'}</div></div>
       <div class="di"><div class="di-label">Fecha Notificación</div><div class="di-val">${formatFecha(c.notif)||'—'}</div></div>
       <div class="di"><div class="di-label">Fecha Embargo</div><div class="di-val">${formatFecha(c.embargo)||'—'}</div></div>
-      ${c.monto?`<div class="di full"><div class="di-label">Monto</div><div class="di-val mo">${formatMonto(c.monto)}</div></div>`:''}
+      ${c.monto?`<div class="di"><div class="di-label">Monto</div><div class="di-val mo">${formatMonto(c.monto)}</div></div>`:''}
     </div>
     <div class="sec-label">Equipo</div>
     <div class="dgrid">
@@ -538,9 +537,9 @@ function openDetail(id) {
     <div class="sec-label">Observaciones</div>
     <div class="dgrid">
       <div class="di full">
-        <div class="di-label">Última Revisión</div>
+        <div class="di-label">Fecha</div>
         <div class="di-val" style="margin-bottom:10px">${formatFecha(c.revision)||'—'}</div>
-        <div class="di-label">Notas</div>
+        <div class="di-label">Observaciones</div>
         <div class="di-val mu">${c.obs||'—'}</div>
       </div>
     </div>
@@ -584,8 +583,8 @@ document.getElementById('btnSaveConfig').addEventListener('click', () => {
     col_embargo:document.getElementById('col_embargo').value||'N',
     col_etapa:document.getElementById('col_etapa').value||'O',
     col_revision:document.getElementById('col_revision').value||'P',
-    col_abogado:document.getElementById('col_abogado').value||'Q',
-    col_obs:document.getElementById('col_obs').value||'R',
+    col_abogado:document.getElementById('col_abogado').value||'R',
+    col_obs:document.getElementById('col_obs').value||'S',
   };
   localStorage.setItem('causas_v7', JSON.stringify(config));
   closeOverlay('configOverlay');
