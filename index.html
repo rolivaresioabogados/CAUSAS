@@ -75,6 +75,8 @@
     .chip.c-ica.active { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
     .chip.c-alerta { color: #f43f5e; border-color: rgba(244,63,94,0.4); }
     .chip.c-alerta.active { background: #f43f5e; border-color: #f43f5e; color: #fff; }
+    .chip.c-bsan { color: #f97316; border-color: rgba(249,115,22,0.4); }
+    .chip.c-bsan.active { background: #f97316; border-color: #f97316; color: #fff; }
 
     /* ABOGADO BTNS (con contador dinámico) */
     .abog-btn {
@@ -274,6 +276,7 @@ let selEstados = new Set();
 let selICA = false;
 let selAlertaNot = false;
 let selAlertaEmb = false;
+let selBSAN = false;
 let selAbogado = null;
 // Siempre usar config por defecto — ignorar localStorage
 let config = Object.assign({}, DEFAULT_CFG);
@@ -350,7 +353,7 @@ async function loadData() {
       obs:gcv(row,config.col_obs),
     })).filter(c => c.cliente||c.rol||c.demandado);
 
-    selEstados.clear(); selICA=false; selAlertaNot=false; selAlertaEmb=false; selAbogado=null;
+    selEstados.clear(); selICA=false; selAlertaNot=false; selAlertaEmb=false; selBSAN=false; selAbogado=null;
     buildEstadoBar();
     buildAbogadoBar();
     applyFilters();
@@ -368,7 +371,8 @@ function getFiltered() {
     const mA = !selAbogado || c.abogado===selAbogado;
     const mAN = !selAlertaNot || (diasEntre(c.fecha) > 90 && !c.notif);
     const mAE = !selAlertaEmb || (diasEntre(c.notif) > 30 && !c.embargo);
-    return mQ && mE && mI && mA && mAN && mAE;
+    const mBS = !selBSAN || (c.cliente||'').toUpperCase().includes('SANTANDER');
+    return mQ && mE && mI && mA && mAN && mAE && mBS;
   });
 }
 
@@ -404,6 +408,20 @@ function buildEstadoBar() {
     const dias = diasEntre(c.notif);
     return dias !== null && dias > 30 && !c.embargo;
   }).length;
+
+  // Chip BSAN
+  const bsanCount = allCausas.filter(c=>(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
+  if (bsanCount > 0) {
+    const chip = document.createElement('div');
+    chip.className = 'chip c-bsan';
+    chip.innerHTML = `<span class="dot"></span>BSAN <span class="n">${bsanCount}</span>`;
+    chip.addEventListener('click', () => {
+      selBSAN = !selBSAN;
+      chip.classList.toggle('active', selBSAN);
+      applyFilters();
+    });
+    bar.appendChild(chip);
+  }
 
   // Chip ICA
   if (icaCount > 0) {
@@ -628,75 +646,116 @@ document.getElementById('btnCloseChart').addEventListener('click', () => closeOv
 document.getElementById('chartOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeOverlay('chartOverlay'); });
 
 function openChart() {
-  const vigentes = allCausas.filter(c => (c.estado||'').toLowerCase().includes('vigente'));
-  const etapas = {};
-  vigentes.forEach(c => { const e = c.etapa||'Sin etapa'; etapas[e]=(etapas[e]||0)+1; });
-  const labels = Object.keys(etapas);
-  const values = Object.values(etapas);
-  const total = values.reduce((a,b)=>a+b,0);
+  const GRUPOS = {
+    'DEMANDA':      ['demanda presentada'],
+    'PROC. NOT.':   ['encargada receptor','oficios','busqueda negativa','búsqueda negativa'],
+    'NOTIFICADO':   ['notificado'],
+    'EXCEPCIONES':  ['excepciones','probatorio','sentencia','incidente'],
+    'SUSPENDIDO':   ['suspendido tribunal','suspendido banco'],
+    'PROC. CIERRE': ['devolucion titulos','devolución títulos','avenimiento','prescripcion','prescripción','convenio castigo','acumulacion','acumulación','pago','dacion','dación'],
+    'REMATE':       ['remate'],
+  };
 
-  const COLORS = ['#10b981','#3b82f6','#f59e0b','#8b5cf6','#f43f5e','#06b6d4','#ec4899','#84cc16','#f97316','#64748b'];
-  const colors = labels.map((_,i) => COLORS[i % COLORS.length]);
+  const vigentes = allCausas.filter(c => (c.estado||'').toLowerCase().includes('vigente'));
+  const conteos = {};
+  Object.keys(GRUPOS).forEach(g => conteos[g] = 0);
+  conteos['OTROS'] = 0;
+
+  vigentes.forEach(c => {
+    const etapa = (c.etapa||'').toLowerCase().trim();
+    let asignado = false;
+    for (const [grupo, keywords] of Object.entries(GRUPOS)) {
+      if (keywords.some(k => etapa.includes(k))) {
+        conteos[grupo]++;
+        asignado = true;
+        break;
+      }
+    }
+    if (!asignado) conteos['OTROS']++;
+  });
+
+  // Eliminar grupos con 0
+  const labels = Object.keys(conteos).filter(k => conteos[k] > 0);
+  const values = labels.map(k => conteos[k]);
+  const total = vigentes.length;
+
+  const COLORS = {
+    'DEMANDA':'#3b82f6', 'PROC. NOT.':'#f59e0b', 'NOTIFICADO':'#10b981',
+    'EXCEPCIONES':'#8b5cf6', 'SUSPENDIDO':'#f43f5e', 'PROC. CIERRE':'#06b6d4',
+    'REMATE':'#f97316', 'OTROS':'#64748b'
+  };
 
   document.getElementById('chartTotal').textContent = `Causas Vigentes: ${total}`;
 
-  // Dibujar torta en canvas
+  // Canvas para barras
   const canvas = document.getElementById('chartCanvas');
-  const size = Math.min(window.innerWidth - 80, 280);
-  canvas.width = size;
-  canvas.height = size;
+  const W = Math.min(window.innerWidth - 40, 640);
+  const barH = 36;
+  const gap = 10;
+  const labelW = 110;
+  const H = labels.length * (barH + gap) + 20;
+  canvas.width = W;
+  canvas.height = H;
   canvas.style.display = 'block';
-  canvas.style.margin = '0 auto';
+  canvas.style.width = '100%';
+  canvas.style.height = H + 'px';
+  canvas.style.margin = '0';
 
   const ctx = canvas.getContext('2d');
-  const cx = size/2, cy = size/2, r = size/2 - 10;
-  let startAngle = -Math.PI/2;
+  ctx.clearRect(0, 0, W, H);
+  const maxVal = Math.max(...values);
+  const barMaxW = W - labelW - 50;
 
-  values.forEach((val, i) => {
-    const slice = (val/total) * 2 * Math.PI;
+  labels.forEach((label, i) => {
+    const y = i * (barH + gap) + 10;
+    const barW = maxVal > 0 ? (values[i] / maxVal) * barMaxW : 0;
+    const color = COLORS[label] || '#64748b';
+
+    // Label
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = `bold 11px Calibri, sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, labelW - 8, y + barH/2);
+
+    // Barra fondo
+    ctx.fillStyle = '#172236';
     ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, startAngle, startAngle+slice);
-    ctx.closePath();
-    ctx.fillStyle = colors[i];
+    ctx.roundRect(labelW, y, barMaxW, barH, 6);
     ctx.fill();
-    ctx.strokeStyle = '#0b1220';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    startAngle += slice;
+
+    // Barra valor
+    if (barW > 0) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect(labelW, y, barW, barH, 6);
+      ctx.fill();
+    }
+
+    // Número
+    ctx.fillStyle = '#e2eaf5';
+    ctx.font = `bold 13px Calibri, sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(values[i], labelW + barW + 8, y + barH/2);
   });
 
-  // Círculo interior (donut)
-  ctx.beginPath();
-  ctx.arc(cx, cy, r*0.55, 0, 2*Math.PI);
-  ctx.fillStyle = '#111c2d';
-  ctx.fill();
-
-  // Texto central
-  ctx.fillStyle = '#e2eaf5';
-  ctx.font = `bold ${size*0.12}px Calibri, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(total, cx, cy-8);
-  ctx.font = `${size*0.07}px Calibri, sans-serif`;
-  ctx.fillStyle = '#64748b';
-  ctx.fillText('causas', cx, cy+12);
-
-  // Leyenda
+  // Leyenda debajo
   const legend = document.getElementById('chartLegend');
   legend.innerHTML = '';
   labels.forEach((label, i) => {
-    const pct = ((values[i]/total)*100).toFixed(1);
+    const pct = total > 0 ? ((values[i]/total)*100).toFixed(1) : '0.0';
+    const color = COLORS[label] || '#64748b';
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;';
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;';
     row.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:12px;height:12px;border-radius:3px;background:${colors[i]};flex-shrink:0"></div>
-        <span style="font-size:13px;font-weight:600">${label}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:3px;background:${color};flex-shrink:0"></div>
+        <span style="font-size:12px;font-weight:600">${label}</span>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:12px;color:var(--muted)">${pct}%</span>
-        <span style="font-size:14px;font-weight:700;color:${colors[i]}">${values[i]}</span>
+        <span style="font-size:11px;color:var(--muted)">${pct}%</span>
+        <span style="font-size:13px;font-weight:700;color:${color}">${values[i]}</span>
       </div>`;
     legend.appendChild(row);
   });
@@ -704,6 +763,9 @@ function openChart() {
   document.getElementById('chartOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
+
+
 
 
 document.getElementById('btnConfig').addEventListener('click', () => {
@@ -750,4 +812,3 @@ loadData();
 </script>
 </body>
 </html>
-
