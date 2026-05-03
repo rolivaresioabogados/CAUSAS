@@ -271,7 +271,8 @@ let allCausas = [];
 let selEstados = new Set();   // multi-select estados
 let selICA = false;           // filtro ICA
 let selAbogado = null;        // filtro abogado (uno a la vez)
-let config = JSON.parse(localStorage.getItem('causas_v8') || 'null') || DEFAULT_CFG;
+// Siempre usar config por defecto — ignorar localStorage
+let config = Object.assign({}, DEFAULT_CFG);
 
 const STATUS_MAP = {
   'activo':    {color:'#10b981', bg:'rgba(16,185,129,0.12)'},
@@ -687,7 +688,7 @@ document.getElementById('btnSaveConfig').addEventListener('click', () => {
     col_abogado:document.getElementById('col_abogado').value||'R',
     col_obs:document.getElementById('col_obs').value||'S',
   };
-  localStorage.setItem('causas_v8', JSON.stringify(config));
+  localStorage.setItem('causas_cfg', JSON.stringify(config));
   closeOverlay('configOverlay');
   loadData();
 });
