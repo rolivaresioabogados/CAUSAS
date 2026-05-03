@@ -535,10 +535,14 @@ function openDetail(id) {
       <div class="di"><div class="di-label">Abogado</div><div class="di-val">${c.abogado||'—'}</div></div>
       <div class="di"><div class="di-label">Abogado Coordinador</div><div class="di-val">${c.abog_coord||'—'}</div></div>
     </div>
-    <div class="sec-label">Observaciones y Revisión</div>
+    <div class="sec-label">Observaciones</div>
     <div class="dgrid">
-      <div class="di"><div class="di-label">Última Revisión</div><div class="di-val">${formatFecha(c.revision)||'—'}</div></div>
-      ${c.obs?`<div class="di"><div class="di-label">Notas</div><div class="di-val mu">${c.obs}</div></div>`:'<div class="di"><div class="di-label">Notas</div><div class="di-val mu">—</div></div>'}
+      <div class="di full">
+        <div class="di-label">Última Revisión</div>
+        <div class="di-val" style="margin-bottom:10px">${formatFecha(c.revision)||'—'}</div>
+        <div class="di-label">Notas</div>
+        <div class="di-val mu">${c.obs||'—'}</div>
+      </div>
     </div>
   `;
   document.getElementById('detailOverlay').classList.add('open');
