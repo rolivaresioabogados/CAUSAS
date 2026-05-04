@@ -215,7 +215,7 @@
 <div class="overlay" id="chartOverlay">
   <div class="sheet">
     <div class="handle"></div>
-    <div style="font-size:17px;font-weight:700;margin-bottom:4px">Vigentes por Etapa</div>
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px">DISTRIBUCIÓN CARTERA AL <span id="chartFecha"></span></div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:20px" id="chartTotal"></div>
     <canvas id="chartCanvas" style="width:100%;max-height:300px"></canvas>
     <div id="chartLegend" style="margin-top:20px;display:flex;flex-direction:column;gap:8px"></div>
@@ -379,7 +379,7 @@ function getFiltered() {
 function applyFilters() {
   const list = getFiltered();
   renderCards(list);
-  updateAbogadoCounts();
+  updateAllCounts();
 }
 
 // ── ALERTAS ──
@@ -528,25 +528,55 @@ function syncAbogadoBtns() {
   });
 }
 
-function updateAbogadoCounts() {
-  // Contar cuántos resultados hay por abogado con los filtros actuales (excepto el de abogado)
+function updateAllCounts() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  const preFilter = (c) => {
+
+  // Función base sin filtro de abogado ni alertas ni bsan ni ICA ni estado
+  const baseMatch = (c, excluir) => {
     const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs].join(' ').toLowerCase();
     const mQ = !q || txt.includes(q);
-    const mE = selEstados.size===0 || selEstados.has(c.estado||'Sin estado');
-    const mI = !selICA || !!c.rolica;
-    return mQ && mE && mI;
+    const mE = excluir==='estado' ? true : (selEstados.size===0 || selEstados.has(c.estado||'Sin estado'));
+    const mI = excluir==='ica' ? true : (!selICA || !!c.rolica);
+    const mA = excluir==='abog' ? true : (!selAbogado || c.abogado===selAbogado);
+    const mAN = excluir==='not' ? true : (!selAlertaNot || (diasEntre(c.fecha) > 90 && !c.notif));
+    const mAE = excluir==='emb' ? true : (!selAlertaEmb || (diasEntre(c.notif) > 30 && !c.embargo));
+    const mBS = excluir==='bsan' ? true : (!selBSAN || (c.cliente||'').toUpperCase().includes('SANTANDER'));
+    return mQ && mE && mI && mA && mAN && mAE && mBS;
   };
 
+  // Actualizar chips de estado
+  document.querySelectorAll('#estadoBar .chip').forEach(chip => {
+    const nEl = chip.querySelector('.n');
+    if (!nEl) return;
+    let count = 0;
+    if (chip.classList.contains('c-bsan')) {
+      count = allCausas.filter(c => baseMatch(c,'bsan') && (c.cliente||'').toUpperCase().includes('SANTANDER')).length;
+    } else if (chip.classList.contains('c-ica')) {
+      count = allCausas.filter(c => baseMatch(c,'ica') && !!c.rolica).length;
+    } else if (chip.dataset.alerta === 'not') {
+      count = allCausas.filter(c => baseMatch(c,'not') && diasEntre(c.fecha) > 90 && !c.notif).length;
+    } else if (chip.dataset.alerta === 'emb') {
+      count = allCausas.filter(c => baseMatch(c,'emb') && diasEntre(c.notif) > 30 && !c.embargo).length;
+    } else if (chip.dataset.estado) {
+      count = allCausas.filter(c => baseMatch(c,'estado') && (c.estado||'Sin estado')===chip.dataset.estado).length;
+    }
+    nEl.textContent = count;
+    if (!chip.dataset.estado) {
+      chip.style.display = count > 0 ? '' : 'none';
+    } else {
+      chip.style.display = count > 0 ? '' : 'none';
+    }
+  });
+
+  // Actualizar chips de abogado
   document.querySelectorAll('#abogadoBar .abog-btn').forEach(btn => {
     const nEl = btn.querySelector('.n');
     if (!nEl) return;
     let count;
     if (btn.dataset.key==='all') {
-      count = allCausas.filter(preFilter).length;
+      count = allCausas.filter(c => baseMatch(c,'abog')).length;
     } else {
-      count = allCausas.filter(c => preFilter(c) && c.abogado===btn.dataset.abogado).length;
+      count = allCausas.filter(c => baseMatch(c,'abog') && c.abogado===btn.dataset.abogado).length;
     }
     nEl.textContent = count;
     btn.style.display = (btn.dataset.key==='all' || count > 0) ? '' : 'none';
@@ -685,6 +715,9 @@ function openChart() {
     'REMATE':'#f97316', 'OTROS':'#64748b'
   };
 
+  // Fecha de hoy
+  const hoy = new Date().toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'});
+  document.getElementById('chartFecha').textContent = hoy;
   document.getElementById('chartTotal').textContent = `Causas Vigentes: ${total}`;
 
   // Canvas para barras
@@ -703,17 +736,20 @@ function openChart() {
 
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, W, H);
-  const maxVal = Math.max(...values);
+  const maxVal = Math.max(...values, 1);
   const barMaxW = W - labelW - 50;
+
+  // Guardar zonas clickeables
+  const zonas = [];
 
   labels.forEach((label, i) => {
     const y = i * (barH + gap) + 10;
-    const barW = maxVal > 0 ? (values[i] / maxVal) * barMaxW : 0;
+    const barW = (values[i] / maxVal) * barMaxW;
     const color = COLORS[label] || '#64748b';
 
     // Label
     ctx.fillStyle = '#94a3b8';
-    ctx.font = `bold 11px Calibri, sans-serif`;
+    ctx.font = `bold 12px Calibri, sans-serif`;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
     ctx.fillText(label, labelW - 8, y + barH/2);
@@ -738,7 +774,34 @@ function openChart() {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText(values[i], labelW + barW + 8, y + barH/2);
+
+    zonas.push({ y, h: barH, label, grupo: label });
   });
+
+  // Click en barra → mostrar casos de esa etapa
+  canvas.onclick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleY = canvas.height / rect.height;
+    const cy = (e.clientY - rect.top) * scaleY;
+    const zona = zonas.find(z => cy >= z.y && cy <= z.y + z.h);
+    if (!zona) return;
+
+    const keywords = GRUPOS[zona.grupo] || [];
+    const casos = vigentes.filter(c => {
+      const etapa = (c.etapa||'').toLowerCase().trim();
+      if (zona.grupo === 'OTROS') {
+        return !Object.values(GRUPOS).flat().some(k => etapa.includes(k));
+      }
+      return keywords.some(k => etapa.includes(k));
+    });
+
+    closeOverlay('chartOverlay');
+    setTimeout(() => {
+      renderCards(casos);
+      document.getElementById('mainContent').scrollIntoView({behavior:'smooth'});
+    }, 300);
+  };
+  canvas.style.cursor = 'pointer';
 
   // Leyenda debajo
   const legend = document.getElementById('chartLegend');
@@ -757,6 +820,17 @@ function openChart() {
         <span style="font-size:11px;color:var(--muted)">${pct}%</span>
         <span style="font-size:13px;font-weight:700;color:${color}">${values[i]}</span>
       </div>`;
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', () => {
+      const keywords = GRUPOS[label] || [];
+      const casos = vigentes.filter(c => {
+        const etapa = (c.etapa||'').toLowerCase().trim();
+        if (label === 'OTROS') return !Object.values(GRUPOS).flat().some(k => etapa.includes(k));
+        return keywords.some(k => etapa.includes(k));
+      });
+      closeOverlay('chartOverlay');
+      setTimeout(() => { renderCards(casos); }, 300);
+    });
     legend.appendChild(row);
   });
 
