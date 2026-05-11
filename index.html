@@ -325,7 +325,7 @@ function formatMonto(m) {
 async function loadData() {
   showLoading();
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=1`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('Error HTTP '+res.status);
     const text = await res.text();
