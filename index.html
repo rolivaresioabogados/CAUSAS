@@ -309,9 +309,22 @@ function ci(v) {
 
 function formatFecha(f) {
   if (!f) return '';
-  const d = new Date(f);
-  if (isNaN(d.getTime())) return String(f);
-  return d.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const s = String(f).trim();
+  // Google devuelve M/D/YYYY — invertir a DD/MM/YYYY
+  const mdy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (mdy) return `${mdy[2].padStart(2,'0')}/${mdy[1].padStart(2,'0')}/${mdy[3]}`;
+  // YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    const p = s.substring(0,10).split('-');
+    return `${p[2]}/${p[1]}/${p[0]}`;
+  }
+  // Date(año,mes,dia)
+  const gm = s.match(/^Date\((\d+),(\d+),(\d+)\)$/);
+  if (gm) {
+    const d = new Date(parseInt(gm[1]), parseInt(gm[2]), parseInt(gm[3]));
+    return d.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  }
+  return s;
 }
 
 function formatMonto(m) {
@@ -325,13 +338,13 @@ function formatMonto(m) {
 async function loadData() {
   showLoading();
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=1`;
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('Error HTTP '+res.status);
     const text = await res.text();
     const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
     const rows = json.table.rows;
-    const start = config.hasHeader==='1' ? 1 : 0;
+    const start = 2;
 
     function gcv(row, col) {
       const idx = ci(col);
