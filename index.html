@@ -52,6 +52,14 @@
     .chip.c-alerta.active { background: var(--danger); border-color: var(--danger); color: #fff; }
     .chip.c-bsan { color: #f97316; border-color: rgba(249,115,22,0.4); }
     .chip.c-bsan.active { background: #f97316; border-color: #f97316; color: #fff; }
+    .chip.c-bch { color: #3b82f6; border-color: rgba(59,130,246,0.4); }
+    .chip.c-bch.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .chip.c-bch { color: #0ea5e9; border-color: rgba(14,165,233,0.4); }
+    .chip.c-bch.active { background: #0ea5e9; border-color: #0ea5e9; color: #fff; }
+    .chip.c-bch { color: #3b82f6; border-color: rgba(59,130,246,0.4); }
+    .chip.c-bch.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .chip.c-bch { color: #3b82f6; border-color: rgba(59,130,246,0.4); }
+    .chip.c-bch.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
     .abog-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; font-family: var(--font); cursor: pointer; white-space: nowrap; border: 1.5px solid var(--border); background: var(--surface2); color: var(--muted); user-select: none; }
     .abog-btn .n { font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.2); padding: 1px 6px; border-radius: 100px; min-width: 20px; text-align: center; }
     .abog-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(45,212,191,0.07); }
@@ -117,13 +125,16 @@
     .form-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
     .form-section { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 18px 0 10px; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group.full { grid-column: 1/-1; }
     .form-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; width: 100%; }
+    .form-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; width: 100%; min-height: 44px; -webkit-appearance: none; appearance: none; box-sizing: border-box; }
     .form-input:focus { border-color: var(--accent); }
     .form-input::placeholder { color: var(--muted); font-size: 12px; }
-    select.form-input { appearance: none; -webkit-appearance: none; }
+    .form-input[type="date"] { color-scheme: dark; }
+    .form-input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+    select.form-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
     .btn-save { width: 100%; background: var(--accent); border: none; border-radius: 10px; padding: 14px; color: #0b1220; font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 20px; margin-bottom: 10px; }
     .btn-save:disabled { opacity: 0.5; }
     .toast { position: fixed; bottom: calc(20px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: var(--success); color: #fff; padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 700; z-index: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
@@ -299,7 +310,7 @@
 
 <script>
 const SHEET_ID = '1gqpZMP1b8JiTUjOVdcCAiARqzsF9bACPFOLFeufDRo0';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_alcYDOFfHrA_ajIEVlvt6PQyIOyPOGrHzW7f6LuzB4QpUyf-t0_Ixc5aKO7jrFKUfw/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvwOLQtGctfgh7u4znRzmgIGEC63_pn9uF4E4EiLYbXXUtlQbxiv8UN0qf94AD5MWuiA/exec';
 
 const DEFAULT_CFG = {
   hasHeader:'1', col_rol:'A', col_tribunal:'B', col_rolica:'C',
@@ -312,7 +323,7 @@ const DEFAULT_CFG = {
 
 let allCausas = [], validacion = {};
 let selEstados = new Set(), selICA = false, selAlertaNot = false;
-let selAlertaEmb = false, selBSAN = false, selAbogado = null;
+let selAlertaEmb = false, selBSAN = false, selBCH = false, selAbogado = null;
 let editingId = null;
 let config = Object.assign({}, DEFAULT_CFG);
 
@@ -420,7 +431,7 @@ async function loadData() {
       obs:gcv(row,config.col_obs), instruccion:gcv(row,config.col_instruccion),
     })).filter(c => c.cliente||c.rol||c.demandado);
 
-    selEstados.clear(); selICA=false; selAlertaNot=false; selAlertaEmb=false; selBSAN=false; selAbogado=null;
+    selEstados.clear(); selICA=false; selAlertaNot=false; selAlertaEmb=false; selBSAN=false; selBCH=false; selAbogado=null;
     buildEstadoBar();
     buildAbogadoBar();
     applyFilters();
@@ -516,7 +527,8 @@ function getFiltered() {
     const mAN = !selAlertaNot || (diasEntre(c.fecha) > 90 && !c.notif);
     const mAE = !selAlertaEmb || (diasEntre(c.notif) > 30 && !c.embargo);
     const mBS = !selBSAN || (c.cliente||'').toUpperCase().includes('SANTANDER');
-    return mQ && mE && mI && mA && mAN && mAE && mBS;
+    const mBC = !selBCH || (c.cliente||'').toUpperCase().includes('BANCO CHILE');
+    return mQ && mE && mI && mA && mAN && mAE && mBS && mBC;
   });
 }
 
@@ -530,6 +542,7 @@ function buildEstadoBar() {
   allCausas.forEach(c => { const e=c.estado||'Sin estado'; estados[e]=(estados[e]||0)+1; });
   const icaCount = allCausas.filter(c=>c.rolica).length;
   const bsanCount = allCausas.filter(c=>(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
+  const bchCount = allCausas.filter(c=>(c.cliente||'').toUpperCase().includes('BANCO CHILE')).length;
   const notCount = allCausas.filter(c=>diasEntre(c.fecha)>90&&!c.notif).length;
   const embCount = allCausas.filter(c=>diasEntre(c.notif)>30&&!c.embargo).length;
 
@@ -544,6 +557,7 @@ function buildEstadoBar() {
   };
 
   mkChip('BSAN', bsanCount, 'c-bsan', function() { selBSAN=!selBSAN; this.classList.toggle('active',selBSAN); applyFilters(); });
+  mkChip('BCH', bchCount, 'c-bch', function() { selBCH=!selBCH; this.classList.toggle('active',selBCH); applyFilters(); });
   mkChip('ICA', icaCount, 'c-ica', function() { selICA=!selICA; this.classList.toggle('active',selICA); applyFilters(); });
   mkChip('ALERTA NOT', notCount, 'c-alerta', function() { selAlertaNot=!selAlertaNot; this.classList.toggle('active',selAlertaNot); applyFilters(); });
   mkChip('ALERTA EMB', embCount, 'c-alerta', function() { selAlertaEmb=!selAlertaEmb; this.classList.toggle('active',selAlertaEmb); applyFilters(); });
@@ -597,12 +611,14 @@ function updateAllCounts() {
     const mAN = excluir==='not'?true:(!selAlertaNot||(diasEntre(c.fecha)>90&&!c.notif));
     const mAE = excluir==='emb'?true:(!selAlertaEmb||(diasEntre(c.notif)>30&&!c.embargo));
     const mBS = excluir==='bsan'?true:(!selBSAN||(c.cliente||'').toUpperCase().includes('SANTANDER'));
-    return mQ&&mE&&mI&&mA&&mAN&&mAE&&mBS;
+    const mBC = excluir==='bch'?true:(!selBCH||(c.cliente||'').toUpperCase().includes('BANCO CHILE'));
+    return mQ&&mE&&mI&&mA&&mAN&&mAE&&mBS&&mBC;
   };
   document.querySelectorAll('#estadoBar .chip').forEach(chip => {
     const nEl = chip.querySelector('.n'); if (!nEl) return;
     let count = 0;
     if (chip.classList.contains('c-bsan')) count = allCausas.filter(c=>base(c,'bsan')&&(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
+    else if (chip.classList.contains('c-bch')) count = allCausas.filter(c=>base(c,'bch')&&(c.cliente||'').toUpperCase().includes('BANCO CHILE')).length;
     else if (chip.classList.contains('c-ica')) count = allCausas.filter(c=>base(c,'ica')&&!!c.rolica).length;
     else if (chip.dataset.alerta==='not') count = allCausas.filter(c=>base(c,'not')&&diasEntre(c.fecha)>90&&!c.notif).length;
     else if (chip.dataset.alerta==='emb') count = allCausas.filter(c=>base(c,'emb')&&diasEntre(c.notif)>30&&!c.embargo).length;
