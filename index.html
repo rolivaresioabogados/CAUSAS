@@ -54,12 +54,6 @@
     .chip.c-bsan.active { background: #f97316; border-color: #f97316; color: #fff; }
     .chip.c-bch { color: #3b82f6; border-color: rgba(59,130,246,0.4); }
     .chip.c-bch.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-    .chip.c-bch { color: #0ea5e9; border-color: rgba(14,165,233,0.4); }
-    .chip.c-bch.active { background: #0ea5e9; border-color: #0ea5e9; color: #fff; }
-    .chip.c-bch { color: #3b82f6; border-color: rgba(59,130,246,0.4); }
-    .chip.c-bch.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-    .chip.c-bch { color: #3b82f6; border-color: rgba(59,130,246,0.4); }
-    .chip.c-bch.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
     .abog-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; font-family: var(--font); cursor: pointer; white-space: nowrap; border: 1.5px solid var(--border); background: var(--surface2); color: var(--muted); user-select: none; }
     .abog-btn .n { font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.2); padding: 1px 6px; border-radius: 100px; min-width: 20px; text-align: center; }
     .abog-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(45,212,191,0.07); }
@@ -190,10 +184,8 @@
   <div class="state-box"><div class="spinner"></div><h3>Cargando juicios…</h3><p>Conectando con Google Sheets</p></div>
 </main>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- DETAIL -->
 <div class="overlay" id="detailOverlay">
   <div class="sheet">
     <div class="handle"></div>
@@ -202,7 +194,6 @@
   </div>
 </div>
 
-<!-- FORM (editar / nuevo) -->
 <div class="overlay" id="formOverlay">
   <div class="sheet">
     <div class="handle"></div>
@@ -254,7 +245,6 @@
   </div>
 </div>
 
-<!-- CHARTS -->
 <div class="overlay" id="chartOverlay">
   <div class="sheet">
     <div class="handle"></div>
@@ -266,7 +256,6 @@
   </div>
 </div>
 
-<!-- CONFIG -->
 <div class="overlay" id="configOverlay">
   <div class="sheet">
     <div class="handle"></div>
@@ -310,7 +299,7 @@
 
 <script>
 const SHEET_ID = '1gqpZMP1b8JiTUjOVdcCAiARqzsF9bACPFOLFeufDRo0';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvwOLQtGctfgh7u4znRzmgIGEC63_pn9uF4E4EiLYbXXUtlQbxiv8UN0qf94AD5MWuiA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxJGxkGWjT1TAvAD5qPbBdv8waTcqp0wVeP7ke1RQRQuc4fxEKpY3yAf0CWx3ur3MxcA/exec';
 
 const DEFAULT_CFG = {
   hasHeader:'1', col_rol:'A', col_tribunal:'B', col_rolica:'C',
@@ -328,8 +317,8 @@ let editingId = null;
 let config = Object.assign({}, DEFAULT_CFG);
 
 const STATUS_MAP = {
-  'activo':    {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
-  'vigente':   {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
+  'activo':     {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
+  'vigente':    {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
   'pendiente': {color:'#f59e0b',bg:'rgba(245,158,11,0.12)'},
   'en tramite':{color:'#3b82f6',bg:'rgba(59,130,246,0.12)'},
   'en trámite':{color:'#3b82f6',bg:'rgba(59,130,246,0.12)'},
@@ -371,7 +360,6 @@ function formatFecha(f) {
 }
 
 function toDateInput(f) {
-  // Convierte DD/MM/YYYY a YYYY-MM-DD para input type=date
   if (!f) return '';
   const s = String(f).trim();
   const dmy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -396,6 +384,14 @@ function diasEntre(fechaStr) {
   else d = new Date(s);
   if (isNaN(d.getTime())) return null;
   return Math.floor((new Date() - d) / (1000*60*60*24));
+}
+
+function showLoading() {
+  document.getElementById('mainContent').innerHTML = '<div class="state-box"><div class="spinner"></div><h3>Cargando juicios…</h3><p>Conectando con Google Sheets</p></div>';
+}
+
+function showError(msg) {
+  document.getElementById('mainContent').innerHTML = `<div class="state-box"><div class="icon">⚠️</div><h3>Error de conexión</h3><p>${msg}</p></div>`;
 }
 
 // ── LOAD ──
@@ -457,12 +453,9 @@ async function loadValidacion() {
       }).filter(v => v !== '');
     }
 
-    // Columna A: etapa (filas 1-28 aprox), estado (filas 31-32), materia (filas 35+), abog.coord y abogado al final
-    // Columna D: tribunal
     const colA = getCol(0);
     const colD = getCol(3);
 
-    // Separar por secciones según los encabezados en colA
     const etapaIdx = colA.indexOf('ETAPA');
     const estadoIdx = colA.indexOf('ESTADO');
     const materiaIdx = colA.indexOf('MATERIA');
@@ -479,13 +472,12 @@ async function loadValidacion() {
       estado:     slice(estadoIdx, materiaIdx),
       materia:    slice(materiaIdx, abogCoordIdx),
       abog_coord: slice(abogCoordIdx, abogadoIdx),
-      abogado:    slice(abogadoIdx, undefined),
+      abogado:    slice(add_idx = abogadoIdx, undefined),
       tribunal:   colD.filter(v => v && v !== 'TRIBUNAL/SERVICIO'),
       cliente:    [...new Set(allCausas.map(c => c.cliente).filter(Boolean))].sort(),
     };
   } catch(e) {
     console.warn('No se pudo cargar validación:', e.message);
-    // Fallback: usar valores únicos de los datos cargados
     validacion = {
       etapa:      [...new Set(allCausas.map(c=>c.etapa).filter(Boolean))].sort(),
       estado:     [...new Set(allCausas.map(c=>c.estado).filter(Boolean))].sort(),
@@ -515,7 +507,7 @@ function fillSelect(id, opciones, valor) {
   }
 }
 
-// ── FILTERS ──
+// ── FILTERS & UI BARS ──
 function getFiltered() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   return allCausas.filter(c => {
@@ -524,52 +516,117 @@ function getFiltered() {
     const mE = selEstados.size===0 || selEstados.has(c.estado||'Sin estado');
     const mI = !selICA || !!c.rolica;
     const mA = !selAbogado || c.abogado===selAbogado;
-    const mAN = !selAlertaNot || (diasEntre(c.fecha) > 90 && !c.notif);
-    const mAE = !selAlertaEmb || (diasEntre(c.notif) > 30 && !c.embargo);
-    const mBS = !selBSAN || (c.cliente||'').toUpperCase().includes('SANTANDER');
-    const mBC = !selBCH || (c.cliente||'').toUpperCase().includes('BANCO CHILE');
-    return mQ && mE && mI && mA && mAN && mAE && mBS && mBC;
+    
+    let mAN = true;
+    if (selAlertaNot) {
+      const d = diasEntre(c.fecha);
+      mAN = (d !== null && d >= 25 && !c.notif);
+    }
+    let mAE = true;
+    if (selAlertaEmb) {
+      const d = diasEntre(c.notif);
+      mAE = (d !== null && d >= 30 && !c.embargo);
+    }
+    
+    const mBSAN = !selBSAN || (c.cliente||'').toLowerCase().includes('santander');
+    const mBCH = !selBCH || (c.cliente||'').toLowerCase().includes('chile');
+
+    return mQ && mE && mI && mA && mAN && mAE && mBSAN && mBCH;
   });
 }
 
-function applyFilters() { renderCards(getFiltered()); updateAllCounts(); }
+function applyFilters() {
+  const list = getFiltered();
+  const main = document.getElementById('mainContent');
+  if (list.length === 0) {
+    main.innerHTML = '<div class="state-box"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Prueba con otros criterios de búsqueda</p></div>';
+    return;
+  }
 
-// ── ESTADO BAR ──
+  main.innerHTML = '';
+  list.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'card';
+    const st = getStatus(c.estado);
+    item.style.setProperty('--sc', st.color);
+    
+    item.innerHTML = `
+      <div class="card-top">
+        <div class="card-name">${c.cliente || 'Sin Cliente'} ➔ ${c.demandado || 'Sin Demandado'}</div>
+        <span class="sbadge" style="color:${st.color};background:${st.bg}">${c.estado || 'Sin Estado'}</span>
+      </div>
+      <div class="card-sub">${c.rol || 'Sin Rol'} • ${c.tribunal || 'Sin Tribunal'}</div>
+      <div class="card-tags">
+        ${c.rolica ? `<span class="tag ica">ICA: ${c.rolica}</span>` : ''}
+        ${c.etapa ? `<span class="tag hl">${c.etapa}</span>` : ''}
+        ${c.abogado ? `<span class="tag">${c.abogado}</span>` : ''}
+      </div>
+      <div class="card-grid">
+        <div class="cg-item"><span class="cg-label">N° Caso</span><span class="cg-val">${c.ncaso||'—'}</span></div>
+        <span class="cfecha" style="text-align:right;align-self:end">${formatFecha(c.fecha)}</span>
+      </div>
+      <div class="card-foot">
+        <span class="cmonto">${formatMonto(c.monto)}</span>
+      </div>
+    `;
+    item.addEventListener('click', () => showDetail(c));
+    main.appendChild(item);
+  });
+}
+
 function buildEstadoBar() {
+  const counts = {};
+  let tICA = 0, tAN = 0, tAE = 0, tBSAN = 0, tBCH = 0;
+  
+  allCausas.forEach(c => {
+    const e = c.estado || 'Sin estado';
+    counts[e] = (counts[e]||0)+1;
+    if (c.rolica) tICA++;
+    const dF = diasEntre(c.fecha);
+    if (dF !== null && dF >= 25 && !c.notif) tAN++;
+    const dN = diasEntre(c.notif);
+    if (dN !== null && dN >= 30 && !c.embargo) tAE++;
+    if ((c.cliente||'').toLowerCase().includes('santander')) tBSAN++;
+    if ((c.cliente||'').toLowerCase().includes('chile')) tBCH++;
+  });
+
   const bar = document.getElementById('estadoBar');
   bar.innerHTML = '';
-  const estados = {};
-  allCausas.forEach(c => { const e=c.estado||'Sin estado'; estados[e]=(estados[e]||0)+1; });
-  const icaCount = allCausas.filter(c=>c.rolica).length;
-  const bsanCount = allCausas.filter(c=>(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
-  const bchCount = allCausas.filter(c=>(c.cliente||'').toUpperCase().includes('BANCO CHILE')).length;
-  const notCount = allCausas.filter(c=>diasEntre(c.fecha)>90&&!c.notif).length;
-  const embCount = allCausas.filter(c=>diasEntre(c.notif)>30&&!c.embargo).length;
 
-  const mkChip = (label, count, cls, onToggle) => {
-    if (count === 0) return;
+  // Chips de estados normales
+  Object.entries(counts).forEach(([est, n]) => {
     const chip = document.createElement('div');
-    chip.className = 'chip' + (cls?' '+cls:'');
-    chip.innerHTML = `<span class="dot"></span>${label} <span class="n">${count}</span>`;
-    chip.addEventListener('click', onToggle);
+    chip.className = 'chip';
+    if (selEstados.has(est)) chip.classList.add('active');
+    const st = getStatus(est);
+    chip.innerHTML = `<span class="dot" style="color:${st.color}"></span> ${est} <span class="n">${n}</span>`;
+    chip.addEventListener('click', () => {
+      if (selEstados.has(est)) selEstados.delete(est);
+      else selEstados.add(est);
+      chip.classList.toggle('active');
+      applyFilters();
+    });
     bar.appendChild(chip);
-    return chip;
-  };
+  });
 
-  mkChip('BSAN', bsanCount, 'c-bsan', function() { selBSAN=!selBSAN; this.classList.toggle('active',selBSAN); applyFilters(); });
-  mkChip('BCH', bchCount, 'c-bch', function() { selBCH=!selBCH; this.classList.toggle('active',selBCH); applyFilters(); });
-  mkChip('ICA', icaCount, 'c-ica', function() { selICA=!selICA; this.classList.toggle('active',selICA); applyFilters(); });
-  mkChip('ALERTA NOT', notCount, 'c-alerta', function() { selAlertaNot=!selAlertaNot; this.classList.toggle('active',selAlertaNot); applyFilters(); });
-  mkChip('ALERTA EMB', embCount, 'c-alerta', function() { selAlertaEmb=!selAlertaEmb; this.classList.toggle('active',selAlertaEmb); applyFilters(); });
+  // Chips Especiales (Alertas / Filtros rápidos de Clientes habituales)
+  const especiales = [
+    { id:'ica', label:'Con ICA', count: tICA, class:'c-ica', active:()=>selICA, toggle:()=>{selICA=!selICA} },
+    { id:'an', label:'Alerta Notif.', count: tAN, class:'c-alerta', active:()=>selAlertaNot, toggle:()=>{selAlertaNot=!selAlertaNot} },
+    { id:'ae', label:'Alerta Emb.', count: tAE, class:'c-alerta', active:()=>selAlertaEmb, toggle:()=>{selAlertaEmb=!selAlertaEmb} },
+    { id:'bsan', label:'BSAN', count: tBSAN, class:'c-bsan', active:()=>selBSAN, toggle:()=>{selBSAN=!selBSAN} },
+    { id:'bch', label:'BCH', count: tBCH, class:'c-bch', active:()=>selBCH, toggle:()=>{selBCH=!selBCH} },
+  ];
 
-  Object.entries(estados).forEach(([e,n]) => {
-    const s = getStatus(e);
+  especiales.forEach(esp => {
+    if (esp.count === 0 && esp.id.startsWith('alerta')) return;
     const chip = document.createElement('div');
-    chip.className = 'chip'; chip.style.color = s.color; chip.dataset.estado = e;
-    chip.innerHTML = `<span class="dot"></span>${e} <span class="n">${n}</span>`;
-    chip.addEventListener('click', function() {
-      if (selEstados.has(e)) { selEstados.delete(e); this.classList.remove('active'); }
-      else { selEstados.add(e); this.classList.add('active'); }
+    chip.className = `chip ${esp.class}`;
+    if (esp.active()) chip.classList.add('active');
+    chip.innerHTML = `${esp.label} <span class="n">${esp.count}</span>`;
+    chip.addEventListener('click', () => {
+      esp.toggle();
+      chip.classList.toggle('active');
       applyFilters();
     });
     bar.appendChild(chip);
@@ -577,373 +634,230 @@ function buildEstadoBar() {
 }
 
 function buildAbogadoBar() {
+  const counts = {};
+  allCausas.forEach(c => { if(c.abogado) counts[c.abogado] = (counts[c.abogado]||0)+1; });
   const bar = document.getElementById('abogadoBar');
   bar.innerHTML = '';
-  const abogados = [...new Set(allCausas.map(c=>c.abogado).filter(Boolean))];
-  const allBtn = document.createElement('button');
-  allBtn.className = 'abog-btn active'; allBtn.dataset.key='all';
-  allBtn.innerHTML = `Todos <span class="n">${allCausas.length}</span>`;
-  allBtn.addEventListener('click', () => { selAbogado=null; syncAbogadoBtns(); applyFilters(); });
-  bar.appendChild(allBtn);
-  abogados.forEach(a => {
-    const btn = document.createElement('button');
-    btn.className = 'abog-btn'; btn.dataset.abogado=a;
-    btn.innerHTML = `${a} <span class="n">${allCausas.filter(c=>c.abogado===a).length}</span>`;
-    btn.addEventListener('click', () => { selAbogado = selAbogado===a?null:a; syncAbogadoBtns(); applyFilters(); });
+
+  Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([ab, n]) => {
+    const btn = document.createElement('div');
+    btn.className = 'abog-btn';
+    if (selAbogado === ab) btn.classList.add('active');
+    btn.innerHTML = `${ab} <span class="n">${n}</span>`;
+    btn.addEventListener('click', () => {
+      if (selAbogado === ab) selAbogado = null;
+      else selAbogado = ab;
+      Array.from(bar.children).forEach(el => el.classList.remove('active'));
+      if (selAbogado) btn.classList.add('active');
+      applyFilters();
+    });
     bar.appendChild(btn);
   });
 }
 
-function syncAbogadoBtns() {
-  document.querySelectorAll('#abogadoBar .abog-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.key==='all' ? !selAbogado : btn.dataset.abogado===selAbogado);
-  });
-}
+// ── VER DETALLE ──
+function showDetail(c) {
+  editingId = c.id; // Guardamos el ID de la fila mapeada
+  const st = getStatus(c.estado);
+  const cont = document.getElementById('detailContent');
+  
+  cont.innerHTML = `
+    <div class="sheet-title">${c.cliente || '—'} ➔ ${c.demandado || '—'}</div>
+    <div class="sheet-sub">RUT: ${c.rut || '—'} | N° CASO: ${c.ncaso || '—'}</div>
+    <div style="margin-bottom:14px">
+      <span class="sheet-status" style="color:${st.color};background:${st.bg}">${c.estado || 'Sin Estado'}</span>
+    </div>
 
-function updateAllCounts() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  const base = (c, excluir) => {
-    const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs,c.ncaso].join(' ').toLowerCase();
-    const mQ = !q||txt.includes(q);
-    const mE = excluir==='estado'?true:(selEstados.size===0||selEstados.has(c.estado||'Sin estado'));
-    const mI = excluir==='ica'?true:(!selICA||!!c.rolica);
-    const mA = excluir==='abog'?true:(!selAbogado||c.abogado===selAbogado);
-    const mAN = excluir==='not'?true:(!selAlertaNot||(diasEntre(c.fecha)>90&&!c.notif));
-    const mAE = excluir==='emb'?true:(!selAlertaEmb||(diasEntre(c.notif)>30&&!c.embargo));
-    const mBS = excluir==='bsan'?true:(!selBSAN||(c.cliente||'').toUpperCase().includes('SANTANDER'));
-    const mBC = excluir==='bch'?true:(!selBCH||(c.cliente||'').toUpperCase().includes('BANCO CHILE'));
-    return mQ&&mE&&mI&&mA&&mAN&&mAE&&mBS&&mBC;
-  };
-  document.querySelectorAll('#estadoBar .chip').forEach(chip => {
-    const nEl = chip.querySelector('.n'); if (!nEl) return;
-    let count = 0;
-    if (chip.classList.contains('c-bsan')) count = allCausas.filter(c=>base(c,'bsan')&&(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
-    else if (chip.classList.contains('c-bch')) count = allCausas.filter(c=>base(c,'bch')&&(c.cliente||'').toUpperCase().includes('BANCO CHILE')).length;
-    else if (chip.classList.contains('c-ica')) count = allCausas.filter(c=>base(c,'ica')&&!!c.rolica).length;
-    else if (chip.dataset.alerta==='not') count = allCausas.filter(c=>base(c,'not')&&diasEntre(c.fecha)>90&&!c.notif).length;
-    else if (chip.dataset.alerta==='emb') count = allCausas.filter(c=>base(c,'emb')&&diasEntre(c.notif)>30&&!c.embargo).length;
-    else if (chip.dataset.estado) count = allCausas.filter(c=>base(c,'estado')&&(c.estado||'Sin estado')===chip.dataset.estado).length;
-    nEl.textContent = count;
-    chip.style.display = count>0?'':'none';
-  });
-  document.querySelectorAll('#abogadoBar .abog-btn').forEach(btn => {
-    const nEl = btn.querySelector('.n'); if (!nEl) return;
-    const count = btn.dataset.key==='all' ? allCausas.filter(c=>base(c,'abog')).length : allCausas.filter(c=>base(c,'abog')&&c.abogado===btn.dataset.abogado).length;
-    nEl.textContent = count;
-    btn.style.display = (btn.dataset.key==='all'||count>0)?'':'none';
-  });
-}
-
-// ── CARDS ──
-function renderCards(list) {
-  const main = document.getElementById('mainContent');
-  if (!list.length) { main.innerHTML = `<div class="state-box"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Intenta con otro término o filtro.</p></div>`; return; }
-  main.innerHTML = '';
-  list.forEach(c => {
-    const s = getStatus(c.estado);
-    const card = document.createElement('div');
-    card.className = 'card'; card.style.setProperty('--sc', s.color);
-    card.innerHTML = `
-      <div class="card-top">
-        <div class="card-name">${c.demandado||c.cliente||'—'}</div>
-        <div class="sbadge" style="background:${s.bg};color:${s.color}">${c.estado||'Sin estado'}</div>
-      </div>
-      ${c.cliente?`<div class="card-sub">Cliente: ${c.cliente}</div>`:''}
-      ${c.rut?`<div class="card-sub">RUT ${c.rut}</div>`:''}
-      <div class="card-tags">
-        ${c.rol?`<span class="tag hl">ROL ${c.rol}</span>`:''}
-        ${c.rolica?`<span class="tag ica">ICA ${c.rolica}</span>`:''}
-        ${c.tribunal?`<span class="tag">${c.tribunal}</span>`:''}
-        ${c.materia?`<span class="tag">${c.materia}</span>`:''}
-      </div>
-      <div class="card-grid">
-        ${c.etapa?`<div class="cg-item"><span class="cg-label">Etapa</span><span class="cg-val">${c.etapa}</span></div>`:''}
-        ${c.abogado?`<div class="cg-item"><span class="cg-label">Abogado</span><span class="cg-val">${c.abogado}</span></div>`:''}
-      </div>
-      ${(c.monto||c.fecha)?`<div class="card-foot"><span class="cmonto">${c.monto?formatMonto(c.monto):''}</span><span class="cfecha">${formatFecha(c.fecha)}</span></div>`:''}
-    `;
-    card.addEventListener('click', () => openDetail(c.id));
-    main.appendChild(card);
-  });
-}
-
-// ── DETAIL ──
-function openDetail(id) {
-  const c = allCausas.find(x=>x.id===id); if (!c) return;
-  const s = getStatus(c.estado);
-  document.getElementById('detailContent').innerHTML = `
-    <div class="sheet-title">${c.demandado||c.cliente||'Sin nombre'}</div>
-    ${c.cliente?`<div class="sheet-sub">Cliente: ${c.cliente}</div>`:''}
-    ${c.rut?`<div class="sheet-sub">RUT ${c.rut}</div>`:''}
-    <div class="sheet-status" style="background:${s.bg};color:${s.color}">● ${c.estado||'Sin estado'}</div>
     <div class="sheet-actions">
-      <button class="btn-edit" onclick="openEditForm(${c.id})">✏️ Editar caso</button>
+      <button class="btn-edit" id="btnEditCausa">✏️ Editar Expediente</button>
     </div>
-    <div class="sec-label">Identificación</div>
+
+    <div class="sec-label">Tribunal e Identificación</div>
     <div class="dgrid">
-      <div class="di"><div class="di-label">Rol</div><div class="di-val ac">${c.rol||'—'}</div></div>
-      <div class="di"><div class="di-label">N° Caso</div><div class="di-val ac">${c.ncaso||'—'}</div></div>
-      <div class="di"><div class="di-label">Rol ICA</div><div class="di-val pu">${c.rolica||'—'}</div></div>
-      <div class="di"><div class="di-label">Materia</div><div class="di-val">${c.materia||'—'}</div></div>
-      <div class="di full"><div class="di-label">Tribunal</div><div class="di-val">${c.tribunal||'—'}</div></div>
+      <div class="di"><div class="di-label">Rol</div><div class="di-val ac">${c.rol || '—'}</div></div>
+      <div class="di"><div class="di-label">Rol ICA</div><div class="di-val pu">${c.rolica || '—'}</div></div>
+      <div class="di full"><div class="di-label">Tribunal / Servicio</div><div class="di-val">${c.tribunal || '—'}</div></div>
+      <div class="di full"><div class="di-label">Materia</div><div class="di-val">${c.materia || '—'}</div></div>
     </div>
-    <div class="sec-label">Seguimiento</div>
+
+    <div class="sec-label">Seguimiento Financiero y Fechas</div>
     <div class="dgrid">
-      <div class="di"><div class="di-label">Etapa</div><div class="di-val">${c.etapa||'—'}</div></div>
-      <div class="di"><div class="di-label">Monto</div><div class="di-val mo">${c.monto?formatMonto(c.monto):'—'}</div></div>
-      <div class="di"><div class="di-label">Fecha Mora</div><div class="di-val">${formatFecha(c.mora)||'—'}</div></div>
-      <div class="di"><div class="di-label">Fecha Demanda</div><div class="di-val">${formatFecha(c.fecha)||'—'}</div></div>
-      <div class="di"><div class="di-label">Fecha Notificación</div><div class="di-val">${formatFecha(c.notif)||'—'}</div></div>
-      <div class="di"><div class="di-label">Fecha Embargo</div><div class="di-val">${formatFecha(c.embargo)||'—'}</div></div>
+      <div class="di full"><div class="di-label">Monto Demandado</div><div class="di-val mo">${formatMonto(c.monto)}</div></div>
+      <div class="di"><div class="di-label">Fecha Mora</div><div class="di-val">${formatFecha(c.mora)}</div></div>
+      <div class="di"><div class="di-label">Fecha Demanda</div><div class="di-val">${formatFecha(c.fecha)}</div></div>
+      <div class="di"><div class="di-label">Fecha Notificación</div><div class="di-val">${formatFecha(c.notif)}</div></div>
+      <div class="di"><div class="di-label">Fecha Embargo</div><div class="di-val">${formatFecha(c.embargo)}</div></div>
     </div>
-    <div class="sec-label">Equipo</div>
+
+    <div class="sec-label">Asignación Jurídica</div>
     <div class="dgrid">
-      <div class="di"><div class="di-label">Abogado</div><div class="di-val">${c.abogado||'—'}</div></div>
-      <div class="di"><div class="di-label">Abogado Coordinador</div><div class="di-val">${c.abog_coord||'—'}</div></div>
+      <div class="di"><div class="di-label">Abog. Coordinador</div><div class="di-val">${c.abog_coord || '—'}</div></div>
+      <div class="di"><div class="di-label">Abogado Tramitador</div><div class="di-val">${c.abogado || '—'}</div></div>
+      <div class="di full"><div class="di-label">Etapa Procesal</div><div class="di-val" style="color:var(--accent)">${c.etapa || '—'}</div></div>
     </div>
-    <div class="sec-label">Instrucción Abogado</div>
+
+    <div class="sec-label">Bitácora y Comentarios</div>
     <div class="dgrid">
-      <div class="di full"><div class="di-val mu">${c.instruccion||'—'}</div></div>
-    </div>
-    <div class="sec-label">Observaciones</div>
-    <div class="dgrid">
-      <div class="di full">
-        <div class="di-label">Fecha</div>
-        <div class="di-val" style="margin-bottom:10px">${formatFecha(c.revision)||'—'}</div>
-        <div class="di-label">Observaciones</div>
-        <div class="di-val mu">${c.obs||'—'}</div>
-      </div>
+      <div class="di full"><div class="di-label">Última Revisión</div><div class="di-val">${formatFecha(c.revision)}</div></div>
+      <div class="di full"><div class="di-label">Observaciones</div><div class="di-val mu">${c.obs || 'Sin observaciones.'}</div></div>
+      <div class="di full"><div class="di-label">Instrucción Abogado</div><div class="di-val mu" style="color:var(--accent2)">${c.instruccion || 'Sin instrucciones.'}</div></div>
     </div>
   `;
-  openOverlay('detailOverlay');
+
+  document.getElementById('detailOverlay').classList.add('open');
+  document.getElementById('btnEditCausa').addEventListener('click', () => openForm(c));
 }
 
-// ── FORM ──
-function openNewForm() {
-  editingId = null;
-  document.getElementById('formTitle').textContent = 'Nuevo Caso';
-  document.getElementById('formSub').textContent = 'Completa los campos del nuevo caso';
-  clearForm();
-  fillSelect('f_tribunal', validacion.tribunal, '');
-  fillSelect('f_cliente', validacion.cliente, '');
-  fillSelect('f_materia', validacion.materia, '');
-  fillSelect('f_estado', validacion.estado, '');
-  fillSelect('f_etapa', validacion.etapa, '');
-  fillSelect('f_abog_coord', validacion.abog_coord, '');
-  fillSelect('f_abogado', validacion.abogado, '');
-  closeOverlay('detailOverlay');
-  openOverlay('formOverlay');
+// ── FORMULARIO (NUEVO / EDITAR) ──
+function openForm(c = null) {
+  // Cargar selects con datos de la hoja validacion
+  fillSelect('f_tribunal', validacion.tribunal, c ? c.tribunal : '');
+  fillSelect('f_materia', validacion.materia, c ? c.materia : '');
+  fillSelect('f_cliente', validacion.cliente, c ? c.cliente : '');
+  fillSelect('f_estado', validacion.estado, c ? c.estado : '');
+  fillSelect('f_etapa', validacion.etapa, c ? c.etapa : '');
+  fillSelect('f_abog_coord', validacion.abog_coord, c ? c.abog_coord : '');
+  fillSelect('f_abogado', validacion.abogado, c ? c.abogado : '');
+
+  if (c) {
+    editingId = c.id;
+    document.getElementById('formTitle').innerText = "Editar Expediente";
+    document.getElementById('formSub').innerText = "Modifica los datos del registro actual";
+    
+    document.getElementById('f_rol').value = c.rol;
+    document.getElementById('f_ncaso').value = c.ncaso;
+    document.getElementById('f_rolica').value = c.rolica;
+    document.getElementById('f_demandado').value = c.demandado;
+    document.getElementById('f_rut').value = c.rut;
+    document.getElementById('f_monto').value = c.monto;
+    
+    document.getElementById('f_mora').value = toDateInput(c.mora);
+    document.getElementById('f_fecha').value = toDateInput(c.fecha);
+    document.getElementById('f_notif').value = toDateInput(c.notif);
+    document.getElementById('f_embargo').value = toDateInput(c.embargo);
+    document.getElementById('f_revision').value = toDateInput(c.revision);
+    
+    document.getElementById('f_obs').value = c.obs;
+    document.getElementById('f_instruccion').value = c.instruccion;
+    
+    document.getElementById('detailOverlay').classList.remove('open');
+  } else {
+    editingId = null; // Es un nuevo registro
+    document.getElementById('formTitle').innerText = "Nuevo Caso";
+    document.getElementById('formSub').innerText = "Completa los campos para añadir una fila";
+    
+    // Limpiar todos los campos del formulario
+    ['f_rol','f_ncaso','f_rolica','f_demandado','f_rut','f_monto','f_mora','f_fecha','f_notif','f_embargo','f_revision','f_obs','f_instruccion'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  document.getElementById('formOverlay').classList.add('open');
 }
 
-function openEditForm(id) {
-  const c = allCausas.find(x=>x.id===id); if (!c) return;
-  editingId = id;
-  document.getElementById('formTitle').textContent = 'Editar Caso';
-  document.getElementById('formSub').textContent = `ROL ${c.rol||'—'}`;
-
-  fillSelect('f_tribunal', validacion.tribunal, c.tribunal);
-  fillSelect('f_cliente', validacion.cliente, c.cliente);
-  fillSelect('f_materia', validacion.materia, c.materia);
-  fillSelect('f_estado', validacion.estado, c.estado);
-  fillSelect('f_etapa', validacion.etapa, c.etapa);
-  fillSelect('f_abog_coord', validacion.abog_coord, c.abog_coord);
-  fillSelect('f_abogado', validacion.abogado, c.abogado);
-
-  document.getElementById('f_rol').value = c.rol||'';
-  document.getElementById('f_ncaso').value = c.ncaso||'';
-  document.getElementById('f_rolica').value = c.rolica||'';
-  document.getElementById('f_demandado').value = c.demandado||'';
-  document.getElementById('f_rut').value = c.rut||'';
-  document.getElementById('f_monto').value = c.monto||'';
-  document.getElementById('f_mora').value = toDateInput(c.mora);
-  document.getElementById('f_fecha').value = toDateInput(c.fecha);
-  document.getElementById('f_notif').value = toDateInput(c.notif);
-  document.getElementById('f_embargo').value = toDateInput(c.embargo);
-  document.getElementById('f_revision').value = toDateInput(c.revision);
-  document.getElementById('f_obs').value = c.obs||'';
-  document.getElementById('f_instruccion').value = c.instruccion||'';
-
-  closeOverlay('detailOverlay');
-  openOverlay('formOverlay');
-}
-
-function clearForm() {
-  ['f_rol','f_ncaso','f_rolica','f_demandado','f_rut','f_monto',
-   'f_mora','f_fecha','f_notif','f_embargo','f_revision','f_obs','f_instruccion']
-  .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-}
-
-function getFormValues() {
-  const fmtDate = (id) => {
-    const v = document.getElementById(id)?.value;
-    if (!v) return '';
-    const p = v.split('-');
-    return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : v;
-  };
-  // Devuelve array de 20 columnas A-T
-  return [
-    document.getElementById('f_rol').value,           // A
-    document.getElementById('f_tribunal').value,       // B
-    document.getElementById('f_rolica').value,         // C
-    document.getElementById('f_ncaso').value,          // D
-    document.getElementById('f_cliente').value,        // E
-    document.getElementById('f_demandado').value,      // F
-    document.getElementById('f_rut').value,            // G
-    document.getElementById('f_abog_coord').value,     // H
-    document.getElementById('f_materia').value,        // I
-    document.getElementById('f_monto').value,          // J
-    document.getElementById('f_estado').value,         // K
-    fmtDate('f_mora'),                                 // L
-    fmtDate('f_fecha'),                                // M
-    fmtDate('f_notif'),                                // N
-    fmtDate('f_embargo'),                              // O
-    document.getElementById('f_etapa').value,          // P
-    fmtDate('f_revision'),                             // Q
-    document.getElementById('f_abogado').value,        // R
-    document.getElementById('f_obs').value,            // S
-    document.getElementById('f_instruccion').value,    // T
-  ];
-}
-
-async function saveForm() {
+// ── ENVÍO DE DATOS A GOOGLE SCRIPT (POST) ──
+async function enviarFormulario() {
   const btn = document.getElementById('btnSaveForm');
-  btn.disabled = true; btn.textContent = '⏳ Guardando…';
-  const values = getFormValues();
-  const rol = values[0];
-  if (!rol) { showToast('El ROL es obligatorio', true); btn.disabled=false; btn.textContent='💾 Guardar'; return; }
+  btn.disabled = true;
+  btn.innerText = '⌛ Guardando en Google Sheets...';
 
-  const payload = editingId !== null
-    ? { action: 'update', rol, values }
-    : { action: 'insert', values };
+  const rolValor = document.getElementById('f_rol').value.trim();
+
+  // Mapeamos lo que el usuario escribió basándonos en columnas de la A a la T
+  const mapeoValores = {
+    'A': rolValor,
+    'B': document.getElementById('f_tribunal').value,
+    'C': document.getElementById('f_rolica').value,
+    'D': document.getElementById('f_ncaso').value,
+    'E': document.getElementById('f_cliente').value,
+    'F': document.getElementById('f_demandado').value,
+    'G': document.getElementById('f_rut').value,
+    'H': document.getElementById('f_abog_coord').value,
+    'I': document.getElementById('f_materia').value,
+    'J': document.getElementById('f_monto').value,
+    'K': document.getElementById('f_estado').value,
+    'L': formatFechaParaSheet(document.getElementById('f_mora').value),
+    'M': formatFechaParaSheet(document.getElementById('f_fecha').value),
+    'N': formatFechaParaSheet(document.getElementById('f_notif').value),
+    'O': formatFechaParaSheet(document.getElementById('f_embargo').value),
+    'P': document.getElementById('f_etapa').value,
+    'Q': formatFechaParaSheet(document.getElementById('f_revision').value),
+    'R': document.getElementById('f_abogado').value,
+    'S': document.getElementById('f_obs').value,
+    'T': document.getElementById('f_instruccion').value
+  };
+
+  const columnas = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T'];
+  const valuesArray = columnas.map(col => mapeoValores[col] || "");
+
+  // Crear la estructura exacta JSON que requiere tu doPost
+  const payload = {
+    action: (editingId !== null) ? 'update' : 'insert',
+    id: editingId,
+    values: valuesArray
+  };
 
   try {
-    await fetch(SCRIPT_URL, {
+    const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify(payload),
-      mode: 'no-cors'
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
     });
-    showToast(editingId !== null ? '✅ Guardando cambios…' : '✅ Agregando caso…');
-    closeOverlay('formOverlay');
-    setTimeout(loadData, 2000);
-  } catch(e) {
-    showToast('Error de conexión: ' + e.message, true);
+
+    const resJson = await response.json();
+
+    if (resJson.ok) {
+      showToast(payload.action === 'update' ? "¡Cambios guardados con éxito!" : "¡Caso insertado correctamente!", "success");
+      document.getElementById('formOverlay').classList.remove('open');
+      setTimeout(() => { loadData(); }, 1200);
+    } else {
+      showToast("Error de Google Script: " + resJson.error, "error");
+    }
+  } catch (error) {
+    console.error(error);
+    showToast("Error crítico de conexión al enviar.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = '💾 Guardar';
   }
-  btn.disabled=false; btn.textContent='💾 Guardar';
 }
 
-// ── CHARTS ──
-const GRUPOS = {
-  'DEMANDA':      ['demanda presentada'],
-  'PROC. NOT.':   ['encargada receptor','oficios','busqueda negativa','búsqueda negativa'],
-  'NOTIFICADO':   ['notificado'],
-  'EXCEPCIONES':  ['excepciones','probatorio','sentencia','incidente'],
-  'SUSPENDIDO':   ['suspendido tribunal','suspendido banco'],
-  'PROC. CIERRE': ['devolucion titulos','devolución títulos','avenimiento','prescripcion','prescripción','convenio castigo','acumulacion','acumulación','pago','dacion','dación'],
-  'REMATE':       ['remate'],
-};
-const GCOL = { 'DEMANDA':'#3b82f6','PROC. NOT.':'#f59e0b','NOTIFICADO':'#10b981','EXCEPCIONES':'#8b5cf6','SUSPENDIDO':'#f43f5e','PROC. CIERRE':'#06b6d4','REMATE':'#f97316','OTROS':'#64748b' };
-
-function openChart() {
-  const vigentes = allCausas.filter(c=>(c.estado||'').toLowerCase().includes('vigente'));
-  const conteos = {}; Object.keys(GRUPOS).forEach(g=>conteos[g]=0); conteos['OTROS']=0;
-  vigentes.forEach(c => {
-    const e = (c.etapa||'').toLowerCase().trim();
-    let ok = false;
-    for (const [g,kw] of Object.entries(GRUPOS)) { if (kw.some(k=>e.includes(k))) { conteos[g]++; ok=true; break; } }
-    if (!ok) conteos['OTROS']++;
-  });
-  const labels = Object.keys(conteos).filter(k=>conteos[k]>0);
-  const values = labels.map(k=>conteos[k]);
-  const total = vigentes.length;
-  const hoy = new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
-  document.getElementById('chartFecha').textContent = hoy;
-  document.getElementById('chartTotal').textContent = `Causas Vigentes: ${total}`;
-
-  const canvas = document.getElementById('chartCanvas');
-  const W = Math.min(window.innerWidth-40,640);
-  const barH=36, gap=10, labelW=110, H=labels.length*(barH+gap)+20;
-  canvas.width=W; canvas.height=H; canvas.style.cssText=`display:block;width:100%;height:${H}px;margin:0;cursor:pointer`;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-  const maxVal = Math.max(...values,1), barMaxW=W-labelW-50;
-  const zonas = [];
-  labels.forEach((label,i) => {
-    const y=i*(barH+gap)+10, bw=(values[i]/maxVal)*barMaxW, color=GCOL[label]||'#64748b';
-    ctx.fillStyle='#94a3b8'; ctx.font='bold 12px Calibri,sans-serif'; ctx.textAlign='right'; ctx.textBaseline='middle';
-    ctx.fillText(label,labelW-8,y+barH/2);
-    ctx.fillStyle='#172236'; ctx.beginPath(); ctx.roundRect(labelW,y,barMaxW,barH,6); ctx.fill();
-    if (bw>0) { ctx.fillStyle=color; ctx.beginPath(); ctx.roundRect(labelW,y,bw,barH,6); ctx.fill(); }
-    ctx.fillStyle='#e2eaf5'; ctx.font='bold 13px Calibri,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
-    ctx.fillText(values[i],labelW+bw+8,y+barH/2);
-    zonas.push({y,h:barH,label});
-  });
-  canvas.onclick = e => {
-    const rect=canvas.getBoundingClientRect(), scaleY=canvas.height/rect.height;
-    const cy=(e.clientY-rect.top)*scaleY;
-    const zona=zonas.find(z=>cy>=z.y&&cy<=z.y+z.h); if (!zona) return;
-    const kw=GRUPOS[zona.label]||[];
-    const casos=vigentes.filter(c=>{ const et=(c.etapa||'').toLowerCase().trim(); if(zona.label==='OTROS') return !Object.values(GRUPOS).flat().some(k=>et.includes(k)); return kw.some(k=>et.includes(k)); });
-    closeOverlay('chartOverlay'); setTimeout(()=>renderCards(casos),300);
-  };
-  const legend=document.getElementById('chartLegend'); legend.innerHTML='';
-  labels.forEach((label,i) => {
-    const pct=total>0?((values[i]/total)*100).toFixed(1):'0.0', color=GCOL[label]||'#64748b';
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer';
-    row.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:3px;background:${color}"></div><span style="font-size:12px;font-weight:600">${label}</span></div><div style="display:flex;gap:10px;align-items:center"><span style="font-size:11px;color:var(--muted)">${pct}%</span><span style="font-size:13px;font-weight:700;color:${color}">${values[i]}</span></div>`;
-    const kw=GRUPOS[label]||[];
-    row.addEventListener('click',()=>{ const casos=vigentes.filter(c=>{ const et=(c.etapa||'').toLowerCase().trim(); if(label==='OTROS') return !Object.values(GRUPOS).flat().some(k=>et.includes(k)); return kw.some(k=>et.includes(k)); }); closeOverlay('chartOverlay'); setTimeout(()=>renderCards(casos),300); });
-    legend.appendChild(row);
-  });
-  openOverlay('chartOverlay');
+function formatFechaParaSheet(fInput) {
+  if (!fInput) return "";
+  const p = fInput.split('-');
+  if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`; // Retorna DD/MM/YYYY
+  return fInput;
 }
 
-// ── OVERLAY HELPERS ──
-function openOverlay(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
-function closeOverlay(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
-
-function showToast(msg, isError=false) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(isError?' error':'');
-  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+function showToast(msg, tipo) {
+  const t = document.getElementById('toast');
+  t.innerText = msg;
+  t.className = 'toast show';
+  if (tipo === 'error') t.classList.add('error');
+  setTimeout(() => { t.classList.remove('show'); }, 3800);
 }
 
-function showLoading() { document.getElementById('mainContent').innerHTML=`<div class="state-box"><div class="spinner"></div><h3>Cargando juicios…</h3><p>Conectando con Google Sheets</p></div>`; }
-function showError(msg) { document.getElementById('mainContent').innerHTML=`<div class="state-box"><div class="icon">⚠️</div><h3>Error al cargar</h3><p>${msg}</p></div>`; }
-
-// ── EVENTS ──
+// ── EVENTOS ──
 document.getElementById('btnReload').addEventListener('click', loadData);
-document.getElementById('btnNuevo').addEventListener('click', openNewForm);
-document.getElementById('btnChart').addEventListener('click', openChart);
-document.getElementById('btnSaveForm').addEventListener('click', saveForm);
-document.getElementById('btnCloseDetail').addEventListener('click', ()=>closeOverlay('detailOverlay'));
-document.getElementById('btnCloseForm').addEventListener('click', ()=>closeOverlay('formOverlay'));
-document.getElementById('btnCloseChart').addEventListener('click', ()=>closeOverlay('chartOverlay'));
-document.getElementById('btnCloseConfig').addEventListener('click', ()=>closeOverlay('configOverlay'));
+document.getElementById('btnNuevo').addEventListener('click', () => openForm(null));
+document.getElementById('btnCloseDetail').addEventListener('click', () => document.getElementById('detailOverlay').classList.remove('open'));
+document.getElementById('btnCloseForm').addEventListener('click', () => document.getElementById('formOverlay').classList.remove('open'));
+document.getElementById('btnSaveForm').addEventListener('click', enviarFormulario);
+
 document.getElementById('searchInput').addEventListener('input', applyFilters);
 
-['detailOverlay','formOverlay','chartOverlay','configOverlay'].forEach(id => {
-  document.getElementById(id).addEventListener('click', e=>{ if(e.target===e.currentTarget) closeOverlay(id); });
-});
-
-document.getElementById('btnConfig').addEventListener('click', () => {
-  document.getElementById('hasHeader').value = config.hasHeader||'1';
-  Object.keys(DEFAULT_CFG).filter(k=>k!=='hasHeader').forEach(k => {
-    const el=document.getElementById(k); if(el) el.value=config[k]||'';
-  });
-  openOverlay('configOverlay');
-});
-
+// Config simplificada para fines visuales
+document.getElementById('btnConfig').addEventListener('click', () => document.getElementById('configOverlay').classList.add('open'));
+document.getElementById('btnCloseConfig').addEventListener('click', () => document.getElementById('configOverlay').classList.remove('open'));
 document.getElementById('btnSaveConfig').addEventListener('click', () => {
-  config = { hasHeader: document.getElementById('hasHeader').value };
-  Object.keys(DEFAULT_CFG).filter(k=>k!=='hasHeader').forEach(k => {
-    const el=document.getElementById(k); config[k]=el?el.value:DEFAULT_CFG[k];
-  });
-  closeOverlay('configOverlay');
+  showToast("Configuración local guardada", "success");
+  document.getElementById('configOverlay').classList.remove('open');
+});
+
+// Inicializar app
+window.addEventListener('DOMContentLoaded', () => {
   loadData();
 });
-
-loadData();
 </script>
 </body>
 </html>
