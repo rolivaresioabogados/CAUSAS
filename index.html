@@ -204,7 +204,7 @@
       <div class="form-group"><label class="form-label">N° Caso</label><input class="form-input" id="f_ncaso" placeholder="" /></div>
       <div class="form-group full"><label class="form-label">Tribunal / Servicio</label><select class="form-input" id="f_tribunal"></select></div>
       <div class="form-group"><label class="form-label">Rol ICA</label><input class="form-input" id="f_rolica" placeholder="" /></div>
-      <div class="form-group"><label class="form-label">Rol ECS (D)</label><input class="form-input" id="f_rolecs" placeholder="" /></div>
+      <div class="form-group"><label class="form-label">Materia</label><select class="form-input" id="f_materia"></select></div>
     </div>
 
     <div class="form-section">Partes</div>
@@ -212,14 +212,13 @@
       <div class="form-group full"><label class="form-label">Cliente</label><select class="form-input" id="f_cliente"></select></div>
       <div class="form-group full"><label class="form-label">Demandado</label><input class="form-input" id="f_demandado" placeholder="Nombre demandado" /></div>
       <div class="form-group"><label class="form-label">RUT Demandado</label><input class="form-input" id="f_rut" placeholder="12.345.678-9" /></div>
-      <div class="form-group"><label class="form-label">Materia</label><select class="form-input" id="f_materia"></select></div>
     </div>
 
     <div class="form-section">Estado y Seguimiento</div>
     <div class="form-grid">
       <div class="form-group"><label class="form-label">Estado</label><select class="form-input" id="f_estado"></select></div>
       <div class="form-group"><label class="form-label">Etapa</label><select class="form-input" id="f_etapa"></select></div>
-      <div class="form-group"><label class="form-label">Monto</label><input class="form-input" id="f_monto" type="number" placeholder="0" /></div>
+      <div class="form-group"><label class="form-label">Monto</label><input class="form-input" id="f_monto" type="text" placeholder="0" /></div>
       <div class="form-group"><label class="form-label">Fecha Mora</label><input class="form-input" id="f_mora" type="date" /></div>
       <div class="form-group"><label class="form-label">Fecha Demanda</label><input class="form-input" id="f_fecha" type="date" /></div>
       <div class="form-group"><label class="form-label">Fecha Notificación</label><input class="form-input" id="f_notif" type="date" /></div>
@@ -737,7 +736,6 @@ function openEditForm(id) {
   document.getElementById('f_rol').value = c.rol||'';
   document.getElementById('f_ncaso').value = c.ncaso||'';
   document.getElementById('f_rolica').value = c.rolica||'';
-  document.getElementById('f_rolecs').value = '';
   document.getElementById('f_demandado').value = c.demandado||'';
   document.getElementById('f_rut').value = c.rut||'';
   document.getElementById('f_monto').value = c.monto||'';
@@ -754,7 +752,7 @@ function openEditForm(id) {
 }
 
 function clearForm() {
-  ['f_rol','f_ncaso','f_rolica','f_rolecs','f_demandado','f_rut','f_monto',
+  ['f_rol','f_ncaso','f_rolica','f_demandado','f_rut','f_monto',
    'f_mora','f_fecha','f_notif','f_embargo','f_revision','f_obs','f_instruccion']
   .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
 }
@@ -771,7 +769,7 @@ function getFormValues() {
     document.getElementById('f_rol').value,           // A
     document.getElementById('f_tribunal').value,       // B
     document.getElementById('f_rolica').value,         // C
-    document.getElementById('f_rolecs').value,         // D — rol ECS / N°caso
+    document.getElementById('f_ncaso').value,          // D
     document.getElementById('f_cliente').value,        // E
     document.getElementById('f_demandado').value,      // F
     document.getElementById('f_rut').value,            // G
@@ -803,21 +801,14 @@ async function saveForm() {
     : { action: 'insert', values };
 
   try {
-    const res = await fetch(SCRIPT_URL, {
+    await fetch(SCRIPT_URL, {
       method: 'POST',
       body: JSON.stringify(payload),
-      headers: { 'Content-Type': 'text/plain' },
-      redirect: 'follow'
+      mode: 'no-cors'
     });
-    const text = await res.text();
-    const data = JSON.parse(text);
-    if (data.ok) {
-      showToast(editingId !== null ? '✅ Caso actualizado' : '✅ Caso agregado');
-      closeOverlay('formOverlay');
-      setTimeout(loadData, 1000);
-    } else {
-      showToast(data.error || 'Error al guardar', true);
-    }
+    showToast(editingId !== null ? '✅ Guardando cambios…' : '✅ Agregando caso…');
+    closeOverlay('formOverlay');
+    setTimeout(loadData, 2000);
   } catch(e) {
     showToast('Error de conexión: ' + e.message, true);
   }
