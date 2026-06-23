@@ -798,10 +798,16 @@ async function enviarFormulario() {
   };
 
   try {
+    // TRUCO PARA EVITAR CORS: Enviamos los datos como un formulario tradicionalizado
+    const cuerpoFormulario = new URLSearchParams();
+    cuerpoFormulario.append('contents', JSON.stringify(payload));
+
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
+      headers: { 
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' 
+      },
+      body: cuerpoFormulario
     });
 
     const resJson = await response.json();
