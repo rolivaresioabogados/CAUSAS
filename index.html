@@ -12,9 +12,9 @@
     :root {
       --bg: #0b1220; --surface: #111c2d; --surface2: #172236; --border: #1e3050;
       --accent: #2dd4bf; --accent2: #f59e0b; --text: #e2eaf5; --muted: #64748b;
-      --font: Calibri, 'Calibri', 'Gill Sans', sans-serif;
+      --danger: #f43f5e; --success: #10b981;
+      --font: Calibri, 'Gill Sans', sans-serif;
       --mono: 'Courier New', Courier, monospace;
-      --radius: 12px;
       --safe-top: env(safe-area-inset-top);
       --safe-bottom: env(safe-area-inset-bottom);
     }
@@ -23,13 +23,7 @@
     body { display: flex; flex-direction: column; min-height: 100dvh; }
 
     /* HEADER */
-    #appHeader {
-      padding: calc(14px + var(--safe-top)) 18px 14px;
-      background: #0b1220;
-      border-bottom: 2px solid var(--accent);
-      box-shadow: 0 2px 20px rgba(0,0,0,0.5);
-      z-index: 100;
-    }
+    #appHeader { padding: calc(14px + var(--safe-top)) 18px 14px; background: #0b1220; border-bottom: 2px solid var(--accent); box-shadow: 0 2px 20px rgba(0,0,0,0.5); z-index: 100; }
     .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .logo { display: flex; align-items: center; gap: 10px; }
     .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), #0ea5e9); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
@@ -37,8 +31,9 @@
     .logo-text span { color: var(--accent); }
     .header-actions { display: flex; gap: 8px; }
     .btn-icon { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 8px 12px; font-size: 15px; cursor: pointer; font-family: var(--font); }
+    .btn-icon.btn-add { background: var(--accent); color: #0b1220; border-color: var(--accent); font-weight: 700; font-size: 18px; }
     .search-wrap { position: relative; }
-    .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 14px; }
+    .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
     #searchInput { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 11px 11px 36px; color: var(--text); font-family: var(--font); font-size: 14px; outline: none; }
     #searchInput:focus { border-color: var(--accent); }
     #searchInput::placeholder { color: var(--muted); }
@@ -47,66 +42,25 @@
     #filterBars { background: #0b1220; border-bottom: 1px solid var(--border); z-index: 99; }
     .bar-row { display: flex; gap: 10px; padding: 12px 16px; overflow-x: auto; scrollbar-width: none; }
     .bar-row::-webkit-scrollbar { display: none; }
-
-    /* CHIPS (estado - multi select) */
-    .chip {
-      flex-shrink: 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 10px 18px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: var(--font);
-      cursor: pointer;
-      white-space: nowrap;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      user-select: none;
-      -webkit-user-select: none;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-    }
+    .chip { flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; border-radius: 100px; font-size: 13px; font-weight: 700; font-family: var(--font); cursor: pointer; white-space: nowrap; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); user-select: none; -webkit-user-select: none; }
     .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
     .chip .n { font-size: 11px; font-weight: 800; background: rgba(0,0,0,0.2); padding: 1px 7px; border-radius: 100px; min-width: 24px; text-align: center; }
     .chip.active { background: var(--accent); border-color: var(--accent); color: #0b1220; }
     .chip.c-ica { color: #a78bfa; border-color: rgba(139,92,246,0.4); }
     .chip.c-ica.active { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
-    .chip.c-alerta { color: #f43f5e; border-color: rgba(244,63,94,0.4); }
-    .chip.c-alerta.active { background: #f43f5e; border-color: #f43f5e; color: #fff; }
+    .chip.c-alerta { color: var(--danger); border-color: rgba(244,63,94,0.4); }
+    .chip.c-alerta.active { background: var(--danger); border-color: var(--danger); color: #fff; }
     .chip.c-bsan { color: #f97316; border-color: rgba(249,115,22,0.4); }
     .chip.c-bsan.active { background: #f97316; border-color: #f97316; color: #fff; }
-
-    /* ABOGADO BTNS (con contador dinámico) */
-    .abog-btn {
-      flex-shrink: 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      font-family: var(--font);
-      cursor: pointer;
-      white-space: nowrap;
-      border: 1.5px solid var(--border);
-      background: var(--surface2);
-      color: var(--muted);
-      user-select: none;
-      -webkit-user-select: none;
-      transition: all 0.15s;
-    }
-    .abog-btn .n { font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.2); padding: 1px 6px; border-radius: 100px; min-width: 20px; text-align: center; transition: all 0.15s; }
+    .abog-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; font-family: var(--font); cursor: pointer; white-space: nowrap; border: 1.5px solid var(--border); background: var(--surface2); color: var(--muted); user-select: none; }
+    .abog-btn .n { font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.2); padding: 1px 6px; border-radius: 100px; min-width: 20px; text-align: center; }
     .abog-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(45,212,191,0.07); }
-    .abog-btn.active .n { background: rgba(45,212,191,0.2); }
 
     /* MAIN */
     main { flex: 1; padding: 14px 14px calc(16px + var(--safe-bottom)); overflow-y: auto; }
 
     /* CARDS */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 15px; margin-bottom: 10px; cursor: pointer; position: relative; overflow: hidden; transition: opacity 0.15s; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 15px; margin-bottom: 10px; cursor: pointer; position: relative; overflow: hidden; }
     .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--sc, var(--muted)); }
     .card:active { opacity: 0.75; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
@@ -133,15 +87,19 @@
     .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 14px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* MODALS */
+    /* OVERLAYS */
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
     .overlay.open { opacity: 1; pointer-events: all; }
-    .sheet { background: var(--surface); border-radius: 22px 22px 0 0; padding: 22px 18px calc(22px + var(--safe-bottom)); width: 100%; max-height: 90dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.32,0.72,0,1); }
+    .sheet { background: var(--surface); border-radius: 22px 22px 0 0; padding: 22px 18px calc(22px + var(--safe-bottom)); width: 100%; max-height: 92dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.32,0.72,0,1); }
     .overlay.open .sheet { transform: translateY(0); }
     .handle { width: 38px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+
+    /* DETAIL */
     .sheet-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
     .sheet-sub { font-size: 12px; font-family: var(--mono); color: var(--muted); margin-bottom: 6px; }
-    .sheet-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-bottom: 18px; }
+    .sheet-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-bottom: 12px; }
+    .sheet-actions { display: flex; gap: 8px; margin-bottom: 18px; }
+    .btn-edit { flex: 1; background: var(--accent); border: none; border-radius: 10px; padding: 11px; color: #0b1220; font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer; }
     .sec-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; margin-top: 18px; }
     .dgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .di { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px; }
@@ -153,6 +111,24 @@
     .di-val.mo { color: var(--accent2); font-family: var(--mono); font-size: 17px; font-weight: 700; }
     .di-val.mu { color: var(--muted); font-size: 12px; }
     .btn-close { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 13px; color: var(--muted); font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 18px; }
+
+    /* FORM (editar / nuevo) */
+    .form-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .form-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+    .form-section { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 18px 0 10px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1/-1; }
+    .form-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; width: 100%; }
+    .form-input:focus { border-color: var(--accent); }
+    .form-input::placeholder { color: var(--muted); font-size: 12px; }
+    select.form-input { appearance: none; -webkit-appearance: none; }
+    .btn-save { width: 100%; background: var(--accent); border: none; border-radius: 10px; padding: 14px; color: #0b1220; font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 20px; margin-bottom: 10px; }
+    .btn-save:disabled { opacity: 0.5; }
+    .toast { position: fixed; bottom: calc(20px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: var(--success); color: #fff; padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 700; z-index: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .toast.error { background: var(--danger); }
 
     /* CONFIG */
     .cfg-title { font-size: 17px; font-weight: 700; margin-bottom: 5px; }
@@ -167,6 +143,10 @@
     .cl { font-size: 11px; color: var(--muted); width: 130px; flex-shrink: 0; }
     .ci { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; color: var(--text); font-family: var(--mono); font-size: 12px; outline: none; }
     .ci:focus { border-color: var(--accent); }
+
+    /* CHARTS */
+    .chart-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+    .chart-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -179,6 +159,7 @@
     </div>
     <div class="header-actions">
       <button class="btn-icon" id="btnReload">🔄</button>
+      <button class="btn-icon btn-add" id="btnNuevo">＋</button>
       <button class="btn-icon" id="btnChart">📊</button>
       <button class="btn-icon" id="btnConfig">⚙️</button>
     </div>
@@ -195,12 +176,11 @@
 </div>
 
 <main id="mainContent">
-  <div class="state-box">
-    <div class="spinner"></div>
-    <h3>Cargando juicios…</h3>
-    <p>Conectando con Google Sheets</p>
-  </div>
+  <div class="state-box"><div class="spinner"></div><h3>Cargando juicios…</h3><p>Conectando con Google Sheets</p></div>
 </main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <!-- DETAIL -->
 <div class="overlay" id="detailOverlay">
@@ -211,23 +191,77 @@
   </div>
 </div>
 
+<!-- FORM (editar / nuevo) -->
+<div class="overlay" id="formOverlay">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="form-title" id="formTitle">Nuevo Caso</div>
+    <div class="form-sub" id="formSub">Completa los campos del nuevo caso</div>
+
+    <div class="form-section">Identificación</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Rol</label><input class="form-input" id="f_rol" placeholder="C-000-2024" /></div>
+      <div class="form-group"><label class="form-label">N° Caso</label><input class="form-input" id="f_ncaso" placeholder="" /></div>
+      <div class="form-group full"><label class="form-label">Tribunal / Servicio</label><select class="form-input" id="f_tribunal"></select></div>
+      <div class="form-group"><label class="form-label">Rol ICA</label><input class="form-input" id="f_rolica" placeholder="" /></div>
+      <div class="form-group"><label class="form-label">Rol ECS (D)</label><input class="form-input" id="f_rolecs" placeholder="" /></div>
+    </div>
+
+    <div class="form-section">Partes</div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Cliente</label><select class="form-input" id="f_cliente"></select></div>
+      <div class="form-group full"><label class="form-label">Demandado</label><input class="form-input" id="f_demandado" placeholder="Nombre demandado" /></div>
+      <div class="form-group"><label class="form-label">RUT Demandado</label><input class="form-input" id="f_rut" placeholder="12.345.678-9" /></div>
+      <div class="form-group"><label class="form-label">Materia</label><select class="form-input" id="f_materia"></select></div>
+    </div>
+
+    <div class="form-section">Estado y Seguimiento</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Estado</label><select class="form-input" id="f_estado"></select></div>
+      <div class="form-group"><label class="form-label">Etapa</label><select class="form-input" id="f_etapa"></select></div>
+      <div class="form-group"><label class="form-label">Monto</label><input class="form-input" id="f_monto" type="number" placeholder="0" /></div>
+      <div class="form-group"><label class="form-label">Fecha Mora</label><input class="form-input" id="f_mora" type="date" /></div>
+      <div class="form-group"><label class="form-label">Fecha Demanda</label><input class="form-input" id="f_fecha" type="date" /></div>
+      <div class="form-group"><label class="form-label">Fecha Notificación</label><input class="form-input" id="f_notif" type="date" /></div>
+      <div class="form-group"><label class="form-label">Fecha Embargo</label><input class="form-input" id="f_embargo" type="date" /></div>
+    </div>
+
+    <div class="form-section">Equipo</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Abogado Coordinador</label><select class="form-input" id="f_abog_coord"></select></div>
+      <div class="form-group"><label class="form-label">Abogado</label><select class="form-input" id="f_abogado"></select></div>
+    </div>
+
+    <div class="form-section">Observaciones</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Fecha Observación</label><input class="form-input" id="f_revision" type="date" /></div>
+      <div class="form-group full"><label class="form-label">Observaciones</label><textarea class="form-input" id="f_obs" rows="3" placeholder="Texto de observaciones…"></textarea></div>
+      <div class="form-group full"><label class="form-label">Instrucción Abogado</label><textarea class="form-input" id="f_instruccion" rows="3" placeholder="Instrucción…"></textarea></div>
+    </div>
+
+    <button class="btn-save" id="btnSaveForm">💾 Guardar</button>
+    <button class="btn-close" id="btnCloseForm">Cancelar</button>
+  </div>
+</div>
+
 <!-- CHARTS -->
 <div class="overlay" id="chartOverlay">
   <div class="sheet">
     <div class="handle"></div>
-    <div style="font-size:17px;font-weight:700;margin-bottom:4px">DISTRIBUCIÓN CARTERA AL <span id="chartFecha"></span></div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:20px" id="chartTotal"></div>
-    <canvas id="chartCanvas" style="width:100%;max-height:300px"></canvas>
-    <div id="chartLegend" style="margin-top:20px;display:flex;flex-direction:column;gap:8px"></div>
+    <div class="chart-title">DISTRIBUCIÓN CARTERA AL <span id="chartFecha"></span></div>
+    <div class="chart-sub" id="chartTotal"></div>
+    <canvas id="chartCanvas"></canvas>
+    <div id="chartLegend" style="margin-top:16px;display:flex;flex-direction:column;gap:8px"></div>
     <button class="btn-close" id="btnCloseChart" style="margin-top:20px">Cerrar</button>
   </div>
 </div>
 
-
 <!-- CONFIG -->
 <div class="overlay" id="configOverlay">
   <div class="sheet">
-    <p class="cfg-sub">Ajusta el mapeo de columnas.</p>
+    <div class="handle"></div>
+    <div class="cfg-title">Configuración</div>
+    <p class="cfg-sub">Ajusta el mapeo de columnas si es necesario.</p>
     <div class="ig">
       <label class="il">¿Primera fila es encabezado?</label>
       <select class="ti" id="hasHeader">
@@ -241,6 +275,7 @@
       <div class="cr"><span class="cl">Rol</span><input class="ci" id="col_rol" placeholder="A" /></div>
       <div class="cr"><span class="cl">Tribunal</span><input class="ci" id="col_tribunal" placeholder="B" /></div>
       <div class="cr"><span class="cl">Rol ICA</span><input class="ci" id="col_rolica" placeholder="C" /></div>
+      <div class="cr"><span class="cl">N° Caso</span><input class="ci" id="col_ncaso" placeholder="D" /></div>
       <div class="cr"><span class="cl">Cliente</span><input class="ci" id="col_cliente" placeholder="E" /></div>
       <div class="cr"><span class="cl">Demandado</span><input class="ci" id="col_demandado" placeholder="F" /></div>
       <div class="cr"><span class="cl">RUT</span><input class="ci" id="col_rut" placeholder="G" /></div>
@@ -248,13 +283,15 @@
       <div class="cr"><span class="cl">Materia</span><input class="ci" id="col_materia" placeholder="I" /></div>
       <div class="cr"><span class="cl">Monto</span><input class="ci" id="col_monto" placeholder="J" /></div>
       <div class="cr"><span class="cl">Estado</span><input class="ci" id="col_estado" placeholder="K" /></div>
+      <div class="cr"><span class="cl">Fecha Mora</span><input class="ci" id="col_mora" placeholder="L" /></div>
       <div class="cr"><span class="cl">Fecha Demanda</span><input class="ci" id="col_fecha" placeholder="M" /></div>
       <div class="cr"><span class="cl">Fecha Notificación</span><input class="ci" id="col_notif" placeholder="N" /></div>
       <div class="cr"><span class="cl">Fecha Embargo</span><input class="ci" id="col_embargo" placeholder="O" /></div>
       <div class="cr"><span class="cl">Etapa</span><input class="ci" id="col_etapa" placeholder="P" /></div>
-      <div class="cr"><span class="cl">Última Revisión</span><input class="ci" id="col_revision" placeholder="Q" /></div>
+      <div class="cr"><span class="cl">Fecha Observación</span><input class="ci" id="col_revision" placeholder="Q" /></div>
       <div class="cr"><span class="cl">Abogado</span><input class="ci" id="col_abogado" placeholder="R" /></div>
       <div class="cr"><span class="cl">Observaciones</span><input class="ci" id="col_obs" placeholder="S" /></div>
+      <div class="cr"><span class="cl">Instrucción</span><input class="ci" id="col_instruccion" placeholder="T" /></div>
     </div>
     <button class="btn-primary" id="btnSaveConfig">✅ Guardar</button>
     <button class="btn-close" id="btnCloseConfig">Cancelar</button>
@@ -263,35 +300,34 @@
 
 <script>
 const SHEET_ID = '1gqpZMP1b8JiTUjOVdcCAiARqzsF9bACPFOLFeufDRo0';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_alcYDOFfHrA_ajIEVlvt6PQyIOyPOGrHzW7f6LuzB4QpUyf-t0_Ixc5aKO7jrFKUfw/exec';
+
 const DEFAULT_CFG = {
   hasHeader:'1', col_rol:'A', col_tribunal:'B', col_rolica:'C',
-  col_cliente:'E', col_demandado:'F', col_rut:'G', col_abog_coord:'H',
-  col_materia:'I', col_monto:'J', col_estado:'K',
-  col_fecha:'M', col_notif:'N', col_embargo:'O', col_etapa:'P',
-  col_revision:'Q', col_abogado:'R', col_obs:'S'
+  col_ncaso:'D', col_cliente:'E', col_demandado:'F', col_rut:'G',
+  col_abog_coord:'H', col_materia:'I', col_monto:'J', col_estado:'K',
+  col_mora:'L', col_fecha:'M', col_notif:'N', col_embargo:'O',
+  col_etapa:'P', col_revision:'Q', col_abogado:'R', col_obs:'S',
+  col_instruccion:'T'
 };
 
-let allCausas = [];
-let selEstados = new Set();
-let selICA = false;
-let selAlertaNot = false;
-let selAlertaEmb = false;
-let selBSAN = false;
-let selAbogado = null;
-// Siempre usar config por defecto — ignorar localStorage
+let allCausas = [], validacion = {};
+let selEstados = new Set(), selICA = false, selAlertaNot = false;
+let selAlertaEmb = false, selBSAN = false, selAbogado = null;
+let editingId = null;
 let config = Object.assign({}, DEFAULT_CFG);
 
 const STATUS_MAP = {
-  'activo':    {color:'#10b981', bg:'rgba(16,185,129,0.12)'},
-  'vigente':   {color:'#10b981', bg:'rgba(16,185,129,0.12)'},
-  'pendiente': {color:'#f59e0b', bg:'rgba(245,158,11,0.12)'},
-  'en tramite':{color:'#3b82f6', bg:'rgba(59,130,246,0.12)'},
-  'en trámite':{color:'#3b82f6', bg:'rgba(59,130,246,0.12)'},
-  'suspendido':{color:'#f43f5e', bg:'rgba(244,63,94,0.12)'},
-  'cerrado':   {color:'#64748b', bg:'rgba(100,116,139,0.12)'},
-  'terminado': {color:'#64748b', bg:'rgba(100,116,139,0.12)'},
+  'activo':    {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
+  'vigente':   {color:'#10b981',bg:'rgba(16,185,129,0.12)'},
+  'pendiente': {color:'#f59e0b',bg:'rgba(245,158,11,0.12)'},
+  'en tramite':{color:'#3b82f6',bg:'rgba(59,130,246,0.12)'},
+  'en trámite':{color:'#3b82f6',bg:'rgba(59,130,246,0.12)'},
+  'suspendido':{color:'#f43f5e',bg:'rgba(244,63,94,0.12)'},
+  'cerrado':   {color:'#64748b',bg:'rgba(100,116,139,0.12)'},
+  'terminado': {color:'#64748b',bg:'rgba(100,116,139,0.12)'},
 };
-const DEF_S = {color:'#64748b', bg:'rgba(100,116,139,0.12)'};
+const DEF_S = {color:'#64748b',bg:'rgba(100,116,139,0.12)'};
 
 function getStatus(e) {
   if (!e) return DEF_S;
@@ -310,15 +346,12 @@ function ci(v) {
 function formatFecha(f) {
   if (!f) return '';
   const s = String(f).trim();
-  // Google devuelve M/D/YYYY — invertir a DD/MM/YYYY
   const mdy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (mdy) return `${mdy[2].padStart(2,'0')}/${mdy[1].padStart(2,'0')}/${mdy[3]}`;
-  // YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
     const p = s.substring(0,10).split('-');
     return `${p[2]}/${p[1]}/${p[0]}`;
   }
-  // Date(año,mes,dia)
   const gm = s.match(/^Date\((\d+),(\d+),(\d+)\)$/);
   if (gm) {
     const d = new Date(parseInt(gm[1]), parseInt(gm[2]), parseInt(gm[3]));
@@ -327,11 +360,32 @@ function formatFecha(f) {
   return s;
 }
 
+function toDateInput(f) {
+  // Convierte DD/MM/YYYY a YYYY-MM-DD para input type=date
+  if (!f) return '';
+  const s = String(f).trim();
+  const dmy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (dmy) return `${dmy[3]}-${dmy[2].padStart(2,'0')}-${dmy[1].padStart(2,'0')}`;
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0,10);
+  return '';
+}
+
 function formatMonto(m) {
   if (!m) return '';
   const n = parseFloat(String(m).replace(/[^0-9.-]/g,''));
   if (isNaN(n)) return String(m);
   return '$'+n.toLocaleString('es-CL');
+}
+
+function diasEntre(fechaStr) {
+  if (!fechaStr) return null;
+  const s = String(fechaStr).trim();
+  let d;
+  const mdy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (mdy) d = new Date(parseInt(mdy[3]), parseInt(mdy[1])-1, parseInt(mdy[2]));
+  else d = new Date(s);
+  if (isNaN(d.getTime())) return null;
+  return Math.floor((new Date() - d) / (1000*60*60*24));
 }
 
 // ── LOAD ──
@@ -356,28 +410,106 @@ async function loadData() {
 
     allCausas = rows.slice(start).map((row,i) => ({
       id:i, rol:gcv(row,config.col_rol), tribunal:gcv(row,config.col_tribunal),
-      rolica:gcv(row,config.col_rolica), cliente:gcv(row,config.col_cliente),
-      demandado:gcv(row,config.col_demandado), rut:gcv(row,config.col_rut),
-      abog_coord:gcv(row,config.col_abog_coord), materia:gcv(row,config.col_materia),
-      monto:gcv(row,config.col_monto), estado:gcv(row,config.col_estado),
-      fecha:gcv(row,config.col_fecha), etapa:gcv(row,config.col_etapa),
+      rolica:gcv(row,config.col_rolica), ncaso:gcv(row,config.col_ncaso),
+      cliente:gcv(row,config.col_cliente), demandado:gcv(row,config.col_demandado),
+      rut:gcv(row,config.col_rut), abog_coord:gcv(row,config.col_abog_coord),
+      materia:gcv(row,config.col_materia), monto:gcv(row,config.col_monto),
+      estado:gcv(row,config.col_estado), mora:gcv(row,config.col_mora),
+      fecha:gcv(row,config.col_fecha), notif:gcv(row,config.col_notif),
+      embargo:gcv(row,config.col_embargo), etapa:gcv(row,config.col_etapa),
       revision:gcv(row,config.col_revision), abogado:gcv(row,config.col_abogado),
-      notif:gcv(row,config.col_notif), embargo:gcv(row,config.col_embargo),
-      obs:gcv(row,config.col_obs),
+      obs:gcv(row,config.col_obs), instruccion:gcv(row,config.col_instruccion),
     })).filter(c => c.cliente||c.rol||c.demandado);
 
     selEstados.clear(); selICA=false; selAlertaNot=false; selAlertaEmb=false; selBSAN=false; selAbogado=null;
     buildEstadoBar();
     buildAbogadoBar();
     applyFilters();
+    loadValidacion();
   } catch(e) { showError(e.message); }
 }
 
-// ── FILTER LOGIC ──
+// ── VALIDACION (hoja 2) ──
+async function loadValidacion() {
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&sheet=VALIDACION%20DATOS`;
+    const res = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+    const rows = json.table.rows;
+
+    function getCol(colIdx) {
+      return rows.map(r => {
+        if (!r.c || !r.c[colIdx]) return '';
+        const cell = r.c[colIdx];
+        if (!cell || cell.v === null) return '';
+        return String(cell.f || cell.v).trim();
+      }).filter(v => v !== '');
+    }
+
+    // Columna A: etapa (filas 1-28 aprox), estado (filas 31-32), materia (filas 35+), abog.coord y abogado al final
+    // Columna D: tribunal
+    const colA = getCol(0);
+    const colD = getCol(3);
+
+    // Separar por secciones según los encabezados en colA
+    const etapaIdx = colA.indexOf('ETAPA');
+    const estadoIdx = colA.indexOf('ESTADO');
+    const materiaIdx = colA.indexOf('MATERIA');
+    const abogCoordIdx = colA.indexOf('ABOGADO COORDINADOR');
+    const abogadoIdx = colA.indexOf('ABOGADO');
+
+    const slice = (from, to) => colA.slice(
+      from >= 0 ? from + 1 : 0,
+      to >= 0 ? to : undefined
+    ).filter(v => v && v !== '');
+
+    validacion = {
+      etapa:      slice(etapaIdx, estadoIdx >= 0 ? estadoIdx : materiaIdx),
+      estado:     slice(estadoIdx, materiaIdx),
+      materia:    slice(materiaIdx, abogCoordIdx),
+      abog_coord: slice(abogCoordIdx, abogadoIdx),
+      abogado:    slice(abogadoIdx, undefined),
+      tribunal:   colD.filter(v => v && v !== 'TRIBUNAL/SERVICIO'),
+      cliente:    [...new Set(allCausas.map(c => c.cliente).filter(Boolean))].sort(),
+    };
+  } catch(e) {
+    console.warn('No se pudo cargar validación:', e.message);
+    // Fallback: usar valores únicos de los datos cargados
+    validacion = {
+      etapa:      [...new Set(allCausas.map(c=>c.etapa).filter(Boolean))].sort(),
+      estado:     [...new Set(allCausas.map(c=>c.estado).filter(Boolean))].sort(),
+      materia:    [...new Set(allCausas.map(c=>c.materia).filter(Boolean))].sort(),
+      abog_coord: [...new Set(allCausas.map(c=>c.abog_coord).filter(Boolean))].sort(),
+      abogado:    [...new Set(allCausas.map(c=>c.abogado).filter(Boolean))].sort(),
+      tribunal:   [...new Set(allCausas.map(c=>c.tribunal).filter(Boolean))].sort(),
+      cliente:    [...new Set(allCausas.map(c=>c.cliente).filter(Boolean))].sort(),
+    };
+  }
+}
+
+function fillSelect(id, opciones, valor) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '<option value="">— Seleccionar —</option>';
+  (opciones||[]).forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o; opt.textContent = o;
+    if (o === valor) opt.selected = true;
+    el.appendChild(opt);
+  });
+  if (valor && !opciones.includes(valor)) {
+    const opt = document.createElement('option');
+    opt.value = valor; opt.textContent = valor; opt.selected = true;
+    el.appendChild(opt);
+  }
+}
+
+// ── FILTERS ──
 function getFiltered() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   return allCausas.filter(c => {
-    const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs].join(' ').toLowerCase();
+    const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs,c.ncaso].join(' ').toLowerCase();
     const mQ = !q || txt.includes(q);
     const mE = selEstados.size===0 || selEstados.has(c.estado||'Sin estado');
     const mI = !selICA || !!c.rolica;
@@ -389,19 +521,7 @@ function getFiltered() {
   });
 }
 
-function applyFilters() {
-  const list = getFiltered();
-  renderCards(list);
-  updateAllCounts();
-}
-
-// ── ALERTAS ──
-function diasEntre(fechaStr) {
-  if (!fechaStr) return null;
-  const d = new Date(fechaStr);
-  if (isNaN(d.getTime())) return null;
-  return Math.floor((new Date() - d) / (1000*60*60*24));
-}
+function applyFilters() { renderCards(getFiltered()); updateAllCounts(); }
 
 // ── ESTADO BAR ──
 function buildEstadoBar() {
@@ -410,205 +530,104 @@ function buildEstadoBar() {
   const estados = {};
   allCausas.forEach(c => { const e=c.estado||'Sin estado'; estados[e]=(estados[e]||0)+1; });
   const icaCount = allCausas.filter(c=>c.rolica).length;
-
-  // Alertas
-  const alertaNotCount = allCausas.filter(c => {
-    const dias = diasEntre(c.fecha);
-    return dias !== null && dias > 90 && !c.notif;
-  }).length;
-
-  const alertaEmbCount = allCausas.filter(c => {
-    const dias = diasEntre(c.notif);
-    return dias !== null && dias > 30 && !c.embargo;
-  }).length;
-
-  // Chip BSAN
   const bsanCount = allCausas.filter(c=>(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
-  if (bsanCount > 0) {
-    const chip = document.createElement('div');
-    chip.className = 'chip c-bsan';
-    chip.innerHTML = `<span class="dot"></span>BSAN <span class="n">${bsanCount}</span>`;
-    chip.addEventListener('click', () => {
-      selBSAN = !selBSAN;
-      chip.classList.toggle('active', selBSAN);
-      applyFilters();
-    });
-    bar.appendChild(chip);
-  }
+  const notCount = allCausas.filter(c=>diasEntre(c.fecha)>90&&!c.notif).length;
+  const embCount = allCausas.filter(c=>diasEntre(c.notif)>30&&!c.embargo).length;
 
-  // Chip ICA
-  if (icaCount > 0) {
+  const mkChip = (label, count, cls, onToggle) => {
+    if (count === 0) return;
     const chip = document.createElement('div');
-    chip.className = 'chip c-ica';
-    chip.innerHTML = `<span class="dot"></span>ICA <span class="n">${icaCount}</span>`;
-    chip.addEventListener('click', () => {
-      selICA = !selICA;
-      chip.classList.toggle('active', selICA);
-      applyFilters();
-    });
+    chip.className = 'chip' + (cls?' '+cls:'');
+    chip.innerHTML = `<span class="dot"></span>${label} <span class="n">${count}</span>`;
+    chip.addEventListener('click', onToggle);
     bar.appendChild(chip);
-  }
+    return chip;
+  };
 
-  // Chip ALERTA NOT
-  if (alertaNotCount > 0) {
-    const chip = document.createElement('div');
-    chip.className = 'chip c-alerta';
-    chip.dataset.alerta = 'not';
-    chip.innerHTML = `<span class="dot"></span>ALERTA NOT <span class="n">${alertaNotCount}</span>`;
-    chip.addEventListener('click', () => {
-      const active = chip.classList.toggle('active');
-      selAlertaNot = active;
-      applyFilters();
-    });
-    bar.appendChild(chip);
-  }
+  mkChip('BSAN', bsanCount, 'c-bsan', function() { selBSAN=!selBSAN; this.classList.toggle('active',selBSAN); applyFilters(); });
+  mkChip('ICA', icaCount, 'c-ica', function() { selICA=!selICA; this.classList.toggle('active',selICA); applyFilters(); });
+  mkChip('ALERTA NOT', notCount, 'c-alerta', function() { selAlertaNot=!selAlertaNot; this.classList.toggle('active',selAlertaNot); applyFilters(); });
+  mkChip('ALERTA EMB', embCount, 'c-alerta', function() { selAlertaEmb=!selAlertaEmb; this.classList.toggle('active',selAlertaEmb); applyFilters(); });
 
-  // Chip ALERTA EMB
-  if (alertaEmbCount > 0) {
-    const chip = document.createElement('div');
-    chip.className = 'chip c-alerta';
-    chip.dataset.alerta = 'emb';
-    chip.innerHTML = `<span class="dot"></span>ALERTA EMB <span class="n">${alertaEmbCount}</span>`;
-    chip.addEventListener('click', () => {
-      const active = chip.classList.toggle('active');
-      selAlertaEmb = active;
-      applyFilters();
-    });
-    bar.appendChild(chip);
-  }
-
-  // Chips por estado
   Object.entries(estados).forEach(([e,n]) => {
     const s = getStatus(e);
     const chip = document.createElement('div');
-    chip.className = 'chip';
-    chip.style.color = s.color;
-    chip.dataset.estado = e;
+    chip.className = 'chip'; chip.style.color = s.color; chip.dataset.estado = e;
     chip.innerHTML = `<span class="dot"></span>${e} <span class="n">${n}</span>`;
-    chip.addEventListener('click', () => {
-      if (selEstados.has(e)) {
-        selEstados.delete(e);
-        chip.classList.remove('active');
-      } else {
-        selEstados.add(e);
-        chip.classList.add('active');
-      }
+    chip.addEventListener('click', function() {
+      if (selEstados.has(e)) { selEstados.delete(e); this.classList.remove('active'); }
+      else { selEstados.add(e); this.classList.add('active'); }
       applyFilters();
     });
     bar.appendChild(chip);
   });
 }
 
-// ── ABOGADO BAR ──
 function buildAbogadoBar() {
   const bar = document.getElementById('abogadoBar');
   bar.innerHTML = '';
   const abogados = [...new Set(allCausas.map(c=>c.abogado).filter(Boolean))];
-
-  const countFor = (a) => allCausas.filter(c => {
-    const mE = selEstados.size===0 || selEstados.has(c.estado||'Sin estado');
-    const mI = !selICA || !!c.rolica;
-    return c.abogado===a && mE && mI;
-  }).length;
-
-  // Btn "Todos"
   const allBtn = document.createElement('button');
-  allBtn.className = 'abog-btn active';
-  allBtn.dataset.key = 'all';
-  const totalCount = allCausas.length;
-  allBtn.innerHTML = `Todos <span class="n">${totalCount}</span>`;
+  allBtn.className = 'abog-btn active'; allBtn.dataset.key='all';
+  allBtn.innerHTML = `Todos <span class="n">${allCausas.length}</span>`;
   allBtn.addEventListener('click', () => { selAbogado=null; syncAbogadoBtns(); applyFilters(); });
   bar.appendChild(allBtn);
-
   abogados.forEach(a => {
     const btn = document.createElement('button');
-    btn.className = 'abog-btn';
-    btn.dataset.abogado = a;
-    btn.innerHTML = `${a} <span class="n">${countFor(a)}</span>`;
-    btn.addEventListener('click', () => {
-      selAbogado = selAbogado===a ? null : a;
-      syncAbogadoBtns();
-      applyFilters();
-    });
+    btn.className = 'abog-btn'; btn.dataset.abogado=a;
+    btn.innerHTML = `${a} <span class="n">${allCausas.filter(c=>c.abogado===a).length}</span>`;
+    btn.addEventListener('click', () => { selAbogado = selAbogado===a?null:a; syncAbogadoBtns(); applyFilters(); });
     bar.appendChild(btn);
   });
 }
 
 function syncAbogadoBtns() {
   document.querySelectorAll('#abogadoBar .abog-btn').forEach(btn => {
-    const isAll = btn.dataset.key==='all';
-    btn.classList.toggle('active', isAll ? !selAbogado : btn.dataset.abogado===selAbogado);
+    btn.classList.toggle('active', btn.dataset.key==='all' ? !selAbogado : btn.dataset.abogado===selAbogado);
   });
 }
 
 function updateAllCounts() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-
-  // Función base sin filtro de abogado ni alertas ni bsan ni ICA ni estado
-  const baseMatch = (c, excluir) => {
-    const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs].join(' ').toLowerCase();
-    const mQ = !q || txt.includes(q);
-    const mE = excluir==='estado' ? true : (selEstados.size===0 || selEstados.has(c.estado||'Sin estado'));
-    const mI = excluir==='ica' ? true : (!selICA || !!c.rolica);
-    const mA = excluir==='abog' ? true : (!selAbogado || c.abogado===selAbogado);
-    const mAN = excluir==='not' ? true : (!selAlertaNot || (diasEntre(c.fecha) > 90 && !c.notif));
-    const mAE = excluir==='emb' ? true : (!selAlertaEmb || (diasEntre(c.notif) > 30 && !c.embargo));
-    const mBS = excluir==='bsan' ? true : (!selBSAN || (c.cliente||'').toUpperCase().includes('SANTANDER'));
-    return mQ && mE && mI && mA && mAN && mAE && mBS;
+  const base = (c, excluir) => {
+    const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs,c.ncaso].join(' ').toLowerCase();
+    const mQ = !q||txt.includes(q);
+    const mE = excluir==='estado'?true:(selEstados.size===0||selEstados.has(c.estado||'Sin estado'));
+    const mI = excluir==='ica'?true:(!selICA||!!c.rolica);
+    const mA = excluir==='abog'?true:(!selAbogado||c.abogado===selAbogado);
+    const mAN = excluir==='not'?true:(!selAlertaNot||(diasEntre(c.fecha)>90&&!c.notif));
+    const mAE = excluir==='emb'?true:(!selAlertaEmb||(diasEntre(c.notif)>30&&!c.embargo));
+    const mBS = excluir==='bsan'?true:(!selBSAN||(c.cliente||'').toUpperCase().includes('SANTANDER'));
+    return mQ&&mE&&mI&&mA&&mAN&&mAE&&mBS;
   };
-
-  // Actualizar chips de estado
   document.querySelectorAll('#estadoBar .chip').forEach(chip => {
-    const nEl = chip.querySelector('.n');
-    if (!nEl) return;
+    const nEl = chip.querySelector('.n'); if (!nEl) return;
     let count = 0;
-    if (chip.classList.contains('c-bsan')) {
-      count = allCausas.filter(c => baseMatch(c,'bsan') && (c.cliente||'').toUpperCase().includes('SANTANDER')).length;
-    } else if (chip.classList.contains('c-ica')) {
-      count = allCausas.filter(c => baseMatch(c,'ica') && !!c.rolica).length;
-    } else if (chip.dataset.alerta === 'not') {
-      count = allCausas.filter(c => baseMatch(c,'not') && diasEntre(c.fecha) > 90 && !c.notif).length;
-    } else if (chip.dataset.alerta === 'emb') {
-      count = allCausas.filter(c => baseMatch(c,'emb') && diasEntre(c.notif) > 30 && !c.embargo).length;
-    } else if (chip.dataset.estado) {
-      count = allCausas.filter(c => baseMatch(c,'estado') && (c.estado||'Sin estado')===chip.dataset.estado).length;
-    }
+    if (chip.classList.contains('c-bsan')) count = allCausas.filter(c=>base(c,'bsan')&&(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
+    else if (chip.classList.contains('c-ica')) count = allCausas.filter(c=>base(c,'ica')&&!!c.rolica).length;
+    else if (chip.dataset.alerta==='not') count = allCausas.filter(c=>base(c,'not')&&diasEntre(c.fecha)>90&&!c.notif).length;
+    else if (chip.dataset.alerta==='emb') count = allCausas.filter(c=>base(c,'emb')&&diasEntre(c.notif)>30&&!c.embargo).length;
+    else if (chip.dataset.estado) count = allCausas.filter(c=>base(c,'estado')&&(c.estado||'Sin estado')===chip.dataset.estado).length;
     nEl.textContent = count;
-    if (!chip.dataset.estado) {
-      chip.style.display = count > 0 ? '' : 'none';
-    } else {
-      chip.style.display = count > 0 ? '' : 'none';
-    }
+    chip.style.display = count>0?'':'none';
   });
-
-  // Actualizar chips de abogado
   document.querySelectorAll('#abogadoBar .abog-btn').forEach(btn => {
-    const nEl = btn.querySelector('.n');
-    if (!nEl) return;
-    let count;
-    if (btn.dataset.key==='all') {
-      count = allCausas.filter(c => baseMatch(c,'abog')).length;
-    } else {
-      count = allCausas.filter(c => baseMatch(c,'abog') && c.abogado===btn.dataset.abogado).length;
-    }
+    const nEl = btn.querySelector('.n'); if (!nEl) return;
+    const count = btn.dataset.key==='all' ? allCausas.filter(c=>base(c,'abog')).length : allCausas.filter(c=>base(c,'abog')&&c.abogado===btn.dataset.abogado).length;
     nEl.textContent = count;
-    btn.style.display = (btn.dataset.key==='all' || count > 0) ? '' : 'none';
+    btn.style.display = (btn.dataset.key==='all'||count>0)?'':'none';
   });
 }
 
 // ── CARDS ──
 function renderCards(list) {
   const main = document.getElementById('mainContent');
-  if (!list.length) {
-    main.innerHTML = `<div class="state-box"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Intenta con otro término o filtro.</p></div>`;
-    return;
-  }
+  if (!list.length) { main.innerHTML = `<div class="state-box"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Intenta con otro término o filtro.</p></div>`; return; }
   main.innerHTML = '';
   list.forEach(c => {
     const s = getStatus(c.estado);
     const card = document.createElement('div');
-    card.className = 'card';
-    card.style.setProperty('--sc', s.color);
+    card.className = 'card'; card.style.setProperty('--sc', s.color);
     card.innerHTML = `
       <div class="card-top">
         <div class="card-name">${c.demandado||c.cliente||'—'}</div>
@@ -635,31 +654,41 @@ function renderCards(list) {
 
 // ── DETAIL ──
 function openDetail(id) {
-  const c = allCausas.find(x=>x.id===id); if(!c) return;
+  const c = allCausas.find(x=>x.id===id); if (!c) return;
   const s = getStatus(c.estado);
   document.getElementById('detailContent').innerHTML = `
     <div class="sheet-title">${c.demandado||c.cliente||'Sin nombre'}</div>
     ${c.cliente?`<div class="sheet-sub">Cliente: ${c.cliente}</div>`:''}
     ${c.rut?`<div class="sheet-sub">RUT ${c.rut}</div>`:''}
     <div class="sheet-status" style="background:${s.bg};color:${s.color}">● ${c.estado||'Sin estado'}</div>
+    <div class="sheet-actions">
+      <button class="btn-edit" onclick="openEditForm(${c.id})">✏️ Editar caso</button>
+    </div>
     <div class="sec-label">Identificación</div>
     <div class="dgrid">
       <div class="di"><div class="di-label">Rol</div><div class="di-val ac">${c.rol||'—'}</div></div>
+      <div class="di"><div class="di-label">N° Caso</div><div class="di-val ac">${c.ncaso||'—'}</div></div>
       <div class="di"><div class="di-label">Rol ICA</div><div class="di-val pu">${c.rolica||'—'}</div></div>
-      <div class="di"><div class="di-label">Tribunal</div><div class="di-val">${c.tribunal||'—'}</div></div>
       <div class="di"><div class="di-label">Materia</div><div class="di-val">${c.materia||'—'}</div></div>
+      <div class="di full"><div class="di-label">Tribunal</div><div class="di-val">${c.tribunal||'—'}</div></div>
     </div>
     <div class="sec-label">Seguimiento</div>
     <div class="dgrid">
+      <div class="di"><div class="di-label">Etapa</div><div class="di-val">${c.etapa||'—'}</div></div>
+      <div class="di"><div class="di-label">Monto</div><div class="di-val mo">${c.monto?formatMonto(c.monto):'—'}</div></div>
+      <div class="di"><div class="di-label">Fecha Mora</div><div class="di-val">${formatFecha(c.mora)||'—'}</div></div>
       <div class="di"><div class="di-label">Fecha Demanda</div><div class="di-val">${formatFecha(c.fecha)||'—'}</div></div>
       <div class="di"><div class="di-label">Fecha Notificación</div><div class="di-val">${formatFecha(c.notif)||'—'}</div></div>
       <div class="di"><div class="di-label">Fecha Embargo</div><div class="di-val">${formatFecha(c.embargo)||'—'}</div></div>
-      ${c.monto?`<div class="di"><div class="di-label">Monto</div><div class="di-val mo">${formatMonto(c.monto)}</div></div>`:''}
     </div>
     <div class="sec-label">Equipo</div>
     <div class="dgrid">
       <div class="di"><div class="di-label">Abogado</div><div class="di-val">${c.abogado||'—'}</div></div>
       <div class="di"><div class="di-label">Abogado Coordinador</div><div class="di-val">${c.abog_coord||'—'}</div></div>
+    </div>
+    <div class="sec-label">Instrucción Abogado</div>
+    <div class="dgrid">
+      <div class="di full"><div class="di-val mu">${c.instruccion||'—'}</div></div>
     </div>
     <div class="sec-label">Observaciones</div>
     <div class="dgrid">
@@ -671,229 +700,239 @@ function openDetail(id) {
       </div>
     </div>
   `;
-  document.getElementById('detailOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
+  openOverlay('detailOverlay');
 }
 
-// ── OVERLAYS ──
-function closeOverlay(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
-document.getElementById('detailOverlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeOverlay('detailOverlay'); });
-document.getElementById('configOverlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeOverlay('configOverlay'); });
-document.getElementById('btnCloseDetail').addEventListener('click', ()=>closeOverlay('detailOverlay'));
-document.getElementById('btnCloseConfig').addEventListener('click', ()=>closeOverlay('configOverlay'));
+// ── FORM ──
+function openNewForm() {
+  editingId = null;
+  document.getElementById('formTitle').textContent = 'Nuevo Caso';
+  document.getElementById('formSub').textContent = 'Completa los campos del nuevo caso';
+  clearForm();
+  fillSelect('f_tribunal', validacion.tribunal, '');
+  fillSelect('f_cliente', validacion.cliente, '');
+  fillSelect('f_materia', validacion.materia, '');
+  fillSelect('f_estado', validacion.estado, '');
+  fillSelect('f_etapa', validacion.etapa, '');
+  fillSelect('f_abog_coord', validacion.abog_coord, '');
+  fillSelect('f_abogado', validacion.abogado, '');
+  closeOverlay('detailOverlay');
+  openOverlay('formOverlay');
+}
 
-document.getElementById('btnChart').addEventListener('click', () => {
-  openChart();
-});
-document.getElementById('btnCloseChart').addEventListener('click', () => closeOverlay('chartOverlay'));
-document.getElementById('chartOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeOverlay('chartOverlay'); });
+function openEditForm(id) {
+  const c = allCausas.find(x=>x.id===id); if (!c) return;
+  editingId = id;
+  document.getElementById('formTitle').textContent = 'Editar Caso';
+  document.getElementById('formSub').textContent = `ROL ${c.rol||'—'}`;
+
+  fillSelect('f_tribunal', validacion.tribunal, c.tribunal);
+  fillSelect('f_cliente', validacion.cliente, c.cliente);
+  fillSelect('f_materia', validacion.materia, c.materia);
+  fillSelect('f_estado', validacion.estado, c.estado);
+  fillSelect('f_etapa', validacion.etapa, c.etapa);
+  fillSelect('f_abog_coord', validacion.abog_coord, c.abog_coord);
+  fillSelect('f_abogado', validacion.abogado, c.abogado);
+
+  document.getElementById('f_rol').value = c.rol||'';
+  document.getElementById('f_ncaso').value = c.ncaso||'';
+  document.getElementById('f_rolica').value = c.rolica||'';
+  document.getElementById('f_rolecs').value = '';
+  document.getElementById('f_demandado').value = c.demandado||'';
+  document.getElementById('f_rut').value = c.rut||'';
+  document.getElementById('f_monto').value = c.monto||'';
+  document.getElementById('f_mora').value = toDateInput(c.mora);
+  document.getElementById('f_fecha').value = toDateInput(c.fecha);
+  document.getElementById('f_notif').value = toDateInput(c.notif);
+  document.getElementById('f_embargo').value = toDateInput(c.embargo);
+  document.getElementById('f_revision').value = toDateInput(c.revision);
+  document.getElementById('f_obs').value = c.obs||'';
+  document.getElementById('f_instruccion').value = c.instruccion||'';
+
+  closeOverlay('detailOverlay');
+  openOverlay('formOverlay');
+}
+
+function clearForm() {
+  ['f_rol','f_ncaso','f_rolica','f_rolecs','f_demandado','f_rut','f_monto',
+   'f_mora','f_fecha','f_notif','f_embargo','f_revision','f_obs','f_instruccion']
+  .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+}
+
+function getFormValues() {
+  const fmtDate = (id) => {
+    const v = document.getElementById(id)?.value;
+    if (!v) return '';
+    const p = v.split('-');
+    return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : v;
+  };
+  // Devuelve array de 20 columnas A-T
+  return [
+    document.getElementById('f_rol').value,           // A
+    document.getElementById('f_tribunal').value,       // B
+    document.getElementById('f_rolica').value,         // C
+    document.getElementById('f_rolecs').value,         // D — rol ECS / N°caso
+    document.getElementById('f_cliente').value,        // E
+    document.getElementById('f_demandado').value,      // F
+    document.getElementById('f_rut').value,            // G
+    document.getElementById('f_abog_coord').value,     // H
+    document.getElementById('f_materia').value,        // I
+    document.getElementById('f_monto').value,          // J
+    document.getElementById('f_estado').value,         // K
+    fmtDate('f_mora'),                                 // L
+    fmtDate('f_fecha'),                                // M
+    fmtDate('f_notif'),                                // N
+    fmtDate('f_embargo'),                              // O
+    document.getElementById('f_etapa').value,          // P
+    fmtDate('f_revision'),                             // Q
+    document.getElementById('f_abogado').value,        // R
+    document.getElementById('f_obs').value,            // S
+    document.getElementById('f_instruccion').value,    // T
+  ];
+}
+
+async function saveForm() {
+  const btn = document.getElementById('btnSaveForm');
+  btn.disabled = true; btn.textContent = '⏳ Guardando…';
+  const values = getFormValues();
+  const rol = values[0];
+  if (!rol) { showToast('El ROL es obligatorio', true); btn.disabled=false; btn.textContent='💾 Guardar'; return; }
+
+  const payload = editingId !== null
+    ? { action: 'update', rol, values }
+    : { action: 'insert', values };
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(editingId !== null ? '✅ Caso actualizado' : '✅ Caso agregado');
+      closeOverlay('formOverlay');
+      setTimeout(loadData, 1000);
+    } else {
+      showToast(data.error || 'Error al guardar', true);
+    }
+  } catch(e) {
+    showToast('Error de conexión: ' + e.message, true);
+  }
+  btn.disabled=false; btn.textContent='💾 Guardar';
+}
+
+// ── CHARTS ──
+const GRUPOS = {
+  'DEMANDA':      ['demanda presentada'],
+  'PROC. NOT.':   ['encargada receptor','oficios','busqueda negativa','búsqueda negativa'],
+  'NOTIFICADO':   ['notificado'],
+  'EXCEPCIONES':  ['excepciones','probatorio','sentencia','incidente'],
+  'SUSPENDIDO':   ['suspendido tribunal','suspendido banco'],
+  'PROC. CIERRE': ['devolucion titulos','devolución títulos','avenimiento','prescripcion','prescripción','convenio castigo','acumulacion','acumulación','pago','dacion','dación'],
+  'REMATE':       ['remate'],
+};
+const GCOL = { 'DEMANDA':'#3b82f6','PROC. NOT.':'#f59e0b','NOTIFICADO':'#10b981','EXCEPCIONES':'#8b5cf6','SUSPENDIDO':'#f43f5e','PROC. CIERRE':'#06b6d4','REMATE':'#f97316','OTROS':'#64748b' };
 
 function openChart() {
-  const GRUPOS = {
-    'DEMANDA':      ['demanda presentada'],
-    'PROC. NOT.':   ['encargada receptor','oficios','busqueda negativa','búsqueda negativa'],
-    'NOTIFICADO':   ['notificado'],
-    'EXCEPCIONES':  ['excepciones','probatorio','sentencia','incidente'],
-    'SUSPENDIDO':   ['suspendido tribunal','suspendido banco'],
-    'PROC. CIERRE': ['devolucion titulos','devolución títulos','avenimiento','prescripcion','prescripción','convenio castigo','acumulacion','acumulación','pago','dacion','dación'],
-    'REMATE':       ['remate'],
-  };
-
-  const vigentes = allCausas.filter(c => (c.estado||'').toLowerCase().includes('vigente'));
-  const conteos = {};
-  Object.keys(GRUPOS).forEach(g => conteos[g] = 0);
-  conteos['OTROS'] = 0;
-
+  const vigentes = allCausas.filter(c=>(c.estado||'').toLowerCase().includes('vigente'));
+  const conteos = {}; Object.keys(GRUPOS).forEach(g=>conteos[g]=0); conteos['OTROS']=0;
   vigentes.forEach(c => {
-    const etapa = (c.etapa||'').toLowerCase().trim();
-    let asignado = false;
-    for (const [grupo, keywords] of Object.entries(GRUPOS)) {
-      if (keywords.some(k => etapa.includes(k))) {
-        conteos[grupo]++;
-        asignado = true;
-        break;
-      }
-    }
-    if (!asignado) conteos['OTROS']++;
+    const e = (c.etapa||'').toLowerCase().trim();
+    let ok = false;
+    for (const [g,kw] of Object.entries(GRUPOS)) { if (kw.some(k=>e.includes(k))) { conteos[g]++; ok=true; break; } }
+    if (!ok) conteos['OTROS']++;
   });
-
-  // Eliminar grupos con 0
-  const labels = Object.keys(conteos).filter(k => conteos[k] > 0);
-  const values = labels.map(k => conteos[k]);
+  const labels = Object.keys(conteos).filter(k=>conteos[k]>0);
+  const values = labels.map(k=>conteos[k]);
   const total = vigentes.length;
-
-  const COLORS = {
-    'DEMANDA':'#3b82f6', 'PROC. NOT.':'#f59e0b', 'NOTIFICADO':'#10b981',
-    'EXCEPCIONES':'#8b5cf6', 'SUSPENDIDO':'#f43f5e', 'PROC. CIERRE':'#06b6d4',
-    'REMATE':'#f97316', 'OTROS':'#64748b'
-  };
-
-  // Fecha de hoy
-  const hoy = new Date().toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'});
+  const hoy = new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
   document.getElementById('chartFecha').textContent = hoy;
   document.getElementById('chartTotal').textContent = `Causas Vigentes: ${total}`;
 
-  // Canvas para barras
   const canvas = document.getElementById('chartCanvas');
-  const W = Math.min(window.innerWidth - 40, 640);
-  const barH = 36;
-  const gap = 10;
-  const labelW = 110;
-  const H = labels.length * (barH + gap) + 20;
-  canvas.width = W;
-  canvas.height = H;
-  canvas.style.display = 'block';
-  canvas.style.width = '100%';
-  canvas.style.height = H + 'px';
-  canvas.style.margin = '0';
-
+  const W = Math.min(window.innerWidth-40,640);
+  const barH=36, gap=10, labelW=110, H=labels.length*(barH+gap)+20;
+  canvas.width=W; canvas.height=H; canvas.style.cssText=`display:block;width:100%;height:${H}px;margin:0;cursor:pointer`;
   const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, W, H);
-  const maxVal = Math.max(...values, 1);
-  const barMaxW = W - labelW - 50;
-
-  // Guardar zonas clickeables
+  ctx.clearRect(0,0,W,H);
+  const maxVal = Math.max(...values,1), barMaxW=W-labelW-50;
   const zonas = [];
-
-  labels.forEach((label, i) => {
-    const y = i * (barH + gap) + 10;
-    const barW = (values[i] / maxVal) * barMaxW;
-    const color = COLORS[label] || '#64748b';
-
-    // Label
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = `bold 12px Calibri, sans-serif`;
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, labelW - 8, y + barH/2);
-
-    // Barra fondo
-    ctx.fillStyle = '#172236';
-    ctx.beginPath();
-    ctx.roundRect(labelW, y, barMaxW, barH, 6);
-    ctx.fill();
-
-    // Barra valor
-    if (barW > 0) {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.roundRect(labelW, y, barW, barH, 6);
-      ctx.fill();
-    }
-
-    // Número
-    ctx.fillStyle = '#e2eaf5';
-    ctx.font = `bold 13px Calibri, sans-serif`;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(values[i], labelW + barW + 8, y + barH/2);
-
-    zonas.push({ y, h: barH, label, grupo: label });
+  labels.forEach((label,i) => {
+    const y=i*(barH+gap)+10, bw=(values[i]/maxVal)*barMaxW, color=GCOL[label]||'#64748b';
+    ctx.fillStyle='#94a3b8'; ctx.font='bold 12px Calibri,sans-serif'; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(label,labelW-8,y+barH/2);
+    ctx.fillStyle='#172236'; ctx.beginPath(); ctx.roundRect(labelW,y,barMaxW,barH,6); ctx.fill();
+    if (bw>0) { ctx.fillStyle=color; ctx.beginPath(); ctx.roundRect(labelW,y,bw,barH,6); ctx.fill(); }
+    ctx.fillStyle='#e2eaf5'; ctx.font='bold 13px Calibri,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(values[i],labelW+bw+8,y+barH/2);
+    zonas.push({y,h:barH,label});
   });
-
-  // Click en barra → mostrar casos de esa etapa
-  canvas.onclick = (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const scaleY = canvas.height / rect.height;
-    const cy = (e.clientY - rect.top) * scaleY;
-    const zona = zonas.find(z => cy >= z.y && cy <= z.y + z.h);
-    if (!zona) return;
-
-    const keywords = GRUPOS[zona.grupo] || [];
-    const casos = vigentes.filter(c => {
-      const etapa = (c.etapa||'').toLowerCase().trim();
-      if (zona.grupo === 'OTROS') {
-        return !Object.values(GRUPOS).flat().some(k => etapa.includes(k));
-      }
-      return keywords.some(k => etapa.includes(k));
-    });
-
-    closeOverlay('chartOverlay');
-    setTimeout(() => {
-      renderCards(casos);
-      document.getElementById('mainContent').scrollIntoView({behavior:'smooth'});
-    }, 300);
+  canvas.onclick = e => {
+    const rect=canvas.getBoundingClientRect(), scaleY=canvas.height/rect.height;
+    const cy=(e.clientY-rect.top)*scaleY;
+    const zona=zonas.find(z=>cy>=z.y&&cy<=z.y+z.h); if (!zona) return;
+    const kw=GRUPOS[zona.label]||[];
+    const casos=vigentes.filter(c=>{ const et=(c.etapa||'').toLowerCase().trim(); if(zona.label==='OTROS') return !Object.values(GRUPOS).flat().some(k=>et.includes(k)); return kw.some(k=>et.includes(k)); });
+    closeOverlay('chartOverlay'); setTimeout(()=>renderCards(casos),300);
   };
-  canvas.style.cursor = 'pointer';
-
-  // Leyenda debajo
-  const legend = document.getElementById('chartLegend');
-  legend.innerHTML = '';
-  labels.forEach((label, i) => {
-    const pct = total > 0 ? ((values[i]/total)*100).toFixed(1) : '0.0';
-    const color = COLORS[label] || '#64748b';
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;';
-    row.innerHTML = `
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:10px;height:10px;border-radius:3px;background:${color};flex-shrink:0"></div>
-        <span style="font-size:12px;font-weight:600">${label}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:11px;color:var(--muted)">${pct}%</span>
-        <span style="font-size:13px;font-weight:700;color:${color}">${values[i]}</span>
-      </div>`;
-    row.style.cursor = 'pointer';
-    row.addEventListener('click', () => {
-      const keywords = GRUPOS[label] || [];
-      const casos = vigentes.filter(c => {
-        const etapa = (c.etapa||'').toLowerCase().trim();
-        if (label === 'OTROS') return !Object.values(GRUPOS).flat().some(k => etapa.includes(k));
-        return keywords.some(k => etapa.includes(k));
-      });
-      closeOverlay('chartOverlay');
-      setTimeout(() => { renderCards(casos); }, 300);
-    });
+  const legend=document.getElementById('chartLegend'); legend.innerHTML='';
+  labels.forEach((label,i) => {
+    const pct=total>0?((values[i]/total)*100).toFixed(1):'0.0', color=GCOL[label]||'#64748b';
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer';
+    row.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:3px;background:${color}"></div><span style="font-size:12px;font-weight:600">${label}</span></div><div style="display:flex;gap:10px;align-items:center"><span style="font-size:11px;color:var(--muted)">${pct}%</span><span style="font-size:13px;font-weight:700;color:${color}">${values[i]}</span></div>`;
+    const kw=GRUPOS[label]||[];
+    row.addEventListener('click',()=>{ const casos=vigentes.filter(c=>{ const et=(c.etapa||'').toLowerCase().trim(); if(label==='OTROS') return !Object.values(GRUPOS).flat().some(k=>et.includes(k)); return kw.some(k=>et.includes(k)); }); closeOverlay('chartOverlay'); setTimeout(()=>renderCards(casos),300); });
     legend.appendChild(row);
   });
-
-  document.getElementById('chartOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  openOverlay('chartOverlay');
 }
 
+// ── OVERLAY HELPERS ──
+function openOverlay(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
 
-
-
-
-document.getElementById('btnConfig').addEventListener('click', () => {
-  document.getElementById('hasHeader').value = config.hasHeader||'1';
-  ['rol','tribunal','rolica','cliente','demandado','rut','abog_coord','materia','monto','estado','fecha','notif','embargo','etapa','revision','abogado','obs'].forEach(k => {
-    const el = document.getElementById('col_'+k); if(el) el.value = config['col_'+k]||'';
-  });
-  document.getElementById('configOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
-});
-
-document.getElementById('btnSaveConfig').addEventListener('click', () => {
-  config = {
-    hasHeader: document.getElementById('hasHeader').value,
-    col_rol:document.getElementById('col_rol').value||'A',
-    col_tribunal:document.getElementById('col_tribunal').value||'B',
-    col_rolica:document.getElementById('col_rolica').value||'C',
-    col_cliente:document.getElementById('col_cliente').value||'E',
-    col_demandado:document.getElementById('col_demandado').value||'F',
-    col_rut:document.getElementById('col_rut').value||'G',
-    col_abog_coord:document.getElementById('col_abog_coord').value||'H',
-    col_materia:document.getElementById('col_materia').value||'I',
-    col_monto:document.getElementById('col_monto').value||'J',
-    col_estado:document.getElementById('col_estado').value||'K',
-    col_fecha:document.getElementById('col_fecha').value||'M',
-    col_notif:document.getElementById('col_notif').value||'N',
-    col_embargo:document.getElementById('col_embargo').value||'O',
-    col_etapa:document.getElementById('col_etapa').value||'P',
-    col_revision:document.getElementById('col_revision').value||'Q',
-    col_abogado:document.getElementById('col_abogado').value||'R',
-    col_obs:document.getElementById('col_obs').value||'S',
-  };
-  localStorage.setItem('causas_cfg', JSON.stringify(config));
-  closeOverlay('configOverlay');
-  loadData();
-});
-
-document.getElementById('searchInput').addEventListener('input', applyFilters);
+function showToast(msg, isError=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(isError?' error':'');
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+}
 
 function showLoading() { document.getElementById('mainContent').innerHTML=`<div class="state-box"><div class="spinner"></div><h3>Cargando juicios…</h3><p>Conectando con Google Sheets</p></div>`; }
 function showError(msg) { document.getElementById('mainContent').innerHTML=`<div class="state-box"><div class="icon">⚠️</div><h3>Error al cargar</h3><p>${msg}</p></div>`; }
+
+// ── EVENTS ──
+document.getElementById('btnReload').addEventListener('click', loadData);
+document.getElementById('btnNuevo').addEventListener('click', openNewForm);
+document.getElementById('btnChart').addEventListener('click', openChart);
+document.getElementById('btnSaveForm').addEventListener('click', saveForm);
+document.getElementById('btnCloseDetail').addEventListener('click', ()=>closeOverlay('detailOverlay'));
+document.getElementById('btnCloseForm').addEventListener('click', ()=>closeOverlay('formOverlay'));
+document.getElementById('btnCloseChart').addEventListener('click', ()=>closeOverlay('chartOverlay'));
+document.getElementById('btnCloseConfig').addEventListener('click', ()=>closeOverlay('configOverlay'));
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+['detailOverlay','formOverlay','chartOverlay','configOverlay'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e=>{ if(e.target===e.currentTarget) closeOverlay(id); });
+});
+
+document.getElementById('btnConfig').addEventListener('click', () => {
+  document.getElementById('hasHeader').value = config.hasHeader||'1';
+  Object.keys(DEFAULT_CFG).filter(k=>k!=='hasHeader').forEach(k => {
+    const el=document.getElementById(k); if(el) el.value=config[k]||'';
+  });
+  openOverlay('configOverlay');
+});
+
+document.getElementById('btnSaveConfig').addEventListener('click', () => {
+  config = { hasHeader: document.getElementById('hasHeader').value };
+  Object.keys(DEFAULT_CFG).filter(k=>k!=='hasHeader').forEach(k => {
+    const el=document.getElementById(k); config[k]=el?el.value:DEFAULT_CFG[k];
+  });
+  closeOverlay('configOverlay');
+  loadData();
+});
 
 loadData();
 </script>
