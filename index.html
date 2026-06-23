@@ -806,9 +806,11 @@ async function saveForm() {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       body: JSON.stringify(payload),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'text/plain' },
+      redirect: 'follow'
     });
-    const data = await res.json();
+    const text = await res.text();
+    const data = JSON.parse(text);
     if (data.ok) {
       showToast(editingId !== null ? '✅ Caso actualizado' : '✅ Caso agregado');
       closeOverlay('formOverlay');
