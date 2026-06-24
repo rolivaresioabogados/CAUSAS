@@ -310,7 +310,7 @@
 
 <script>
 const SHEET_ID = '1gqpZMP1b8JiTUjOVdcCAiARqzsF9bACPFOLFeufDRo0';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvwOLQtGctfgh7u4znRzmgIGEC63_pn9uF4E4EiLYbXXUtlQbxiv8UN0qf94AD5MWuiA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbws_mNnLGOXQ0dxRvmNzJZUmr9SctgHKYvte9pZmj4Vzw_BfQ__e16BfmpBVnfwIbUoiw/exec';
 
 const DEFAULT_CFG = {
   hasHeader:'1', col_rol:'A', col_tribunal:'B', col_rolica:'C',
@@ -816,11 +816,23 @@ async function saveForm() {
     ? { action: 'update', rol, values }
     : { action: 'insert', values };
 
+  const formBody = new URLSearchParams();
+  formBody.append('editingId', editingId !== null ? String(editingId) : '');
+  const fields = {
+    rol: values[0], tribunal: values[1], rolica: values[2], ncaso: values[3],
+    cliente: values[4], demandado: values[5], rut: values[6], abog_coord: values[7],
+    materia: values[8], monto: values[9], estado: values[10], mora: values[11],
+    fecha: values[12], notif: values[13], embargo: values[14], etapa: values[15],
+    revision: values[16], abogado: values[17], obs: values[18], instruccion: values[19]
+  };
+  for (const k in fields) formBody.append(k, fields[k] || '');
+
   try {
     await fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify(payload),
-      mode: 'no-cors'
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody
     });
     showToast(editingId !== null ? '✅ Guardando cambios…' : '✅ Agregando caso…');
     closeOverlay('formOverlay');
