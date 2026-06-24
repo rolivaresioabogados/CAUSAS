@@ -812,10 +812,6 @@ async function saveForm() {
   const cliente = values[4];
   if (!cliente) { showToast('El Cliente es obligatorio', true); btn.disabled=false; btn.textContent='💾 Guardar'; return; }
 
-  const payload = editingId !== null
-    ? { action: 'update', rol, values }
-    : { action: 'insert', values };
-
   const formBody = new URLSearchParams();
   formBody.append('editingId', editingId !== null ? String(editingId) : '');
   const fields = {
