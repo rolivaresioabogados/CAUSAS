@@ -809,8 +809,8 @@ async function saveForm() {
   const btn = document.getElementById('btnSaveForm');
   btn.disabled = true; btn.textContent = '⏳ Guardando…';
   const values = getFormValues();
-  const rol = values[0];
-  if (!rol) { showToast('El ROL es obligatorio', true); btn.disabled=false; btn.textContent='💾 Guardar'; return; }
+  const cliente = values[4];
+  if (!cliente) { showToast('El Cliente es obligatorio', true); btn.disabled=false; btn.textContent='💾 Guardar'; return; }
 
   const payload = editingId !== null
     ? { action: 'update', rol, values }
