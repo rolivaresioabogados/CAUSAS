@@ -107,6 +107,12 @@
     .sheet { background: var(--surface); border-radius: 22px 22px 0 0; padding: 22px 18px calc(22px + var(--safe-bottom)); width: 100%; max-height: 92dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.32,0.72,0,1); }
     .overlay.open .sheet { transform: translateY(0); }
     .handle { width: 38px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+    @media (min-width: 768px) {
+      .overlay { align-items: center; }
+      .sheet { max-width: 720px; margin: 0 auto; border-radius: 18px; max-height: 88dvh; transform: translateY(20px); }
+      .overlay.open .sheet { transform: translateY(0); }
+      .handle { display: none; }
+    }
 
     /* DETAIL */
     .sheet-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
@@ -920,66 +926,84 @@ async function saveForm() {
 
 // ── CHARTS ──
 const GRUPOS = {
-  'DEMANDA':      ['demanda presentada'],
-  'PROC. NOT.':   ['encargada receptor','oficios','busqueda negativa','búsqueda negativa'],
-  'NOTIFICADO':   ['notificado'],
-  'EXCEPCIONES':  ['excepciones','probatorio','sentencia','incidente'],
-  'SUSPENDIDO':   ['suspendido tribunal','suspendido banco'],
+  'DEMANDA':      ['demanda presentada','nueva asignacion','nueva asignación','pendiente ingreso','terceria','tercería'],
+  'PROC. NOT.':   ['encargada receptor','oficios','busqueda negativa','búsqueda negativa','exhorto'],
+  'NOTIFICADO':   ['notificado','credito verificado','crédito verificado','cah'],
+  'EXCEPCIONES':  ['excepciones','probatorio','sentencia','incidente','apelacion','apelación'],
+  'SUSPENDIDO':   ['suspendido tribunal','suspendido banco','suspendido'],
   'PROC. CIERRE': ['devolucion titulos','devolución títulos','avenimiento','prescripcion','prescripción','convenio castigo','acumulacion','acumulación','pago','dacion','dación'],
-  'REMATE':       ['remate'],
+  'REMATE':       ['remate','embargo','cumplimiento incidental'],
 };
 const GCOL = { 'DEMANDA':'#3b82f6','PROC. NOT.':'#f59e0b','NOTIFICADO':'#10b981','EXCEPCIONES':'#8b5cf6','SUSPENDIDO':'#f43f5e','PROC. CIERRE':'#06b6d4','REMATE':'#f97316','OTROS':'#64748b' };
+const GRUPOS_REGLA_NOTIF = ['DEMANDA','PROC. NOT.','OTROS'];
+
+// Clasifica un caso en su grupo, aplicando la regla de notificación
+function clasificarCaso(c) {
+  const e = (c.etapa||'').toLowerCase().trim();
+  let grupo = 'OTROS';
+  for (const [g,kw] of Object.entries(GRUPOS)) {
+    if (kw.some(k=>e.includes(k))) { grupo = g; break; }
+  }
+  // Regla: si está en DEMANDA, PROC. NOT. u OTROS pero tiene fecha de notificación → NOTIFICADO
+  if (GRUPOS_REGLA_NOTIF.includes(grupo) && c.notif && String(c.notif).trim() !== '') {
+    grupo = 'NOTIFICADO';
+  }
+  return grupo;
+}
 
 function openChart() {
-  const vigentes = allCausas.filter(c=>(c.estado||'').toLowerCase().includes('vigente'));
-  const conteos = {}; Object.keys(GRUPOS).forEach(g=>conteos[g]=0); conteos['OTROS']=0;
-  vigentes.forEach(c => {
-    const e = (c.etapa||'').toLowerCase().trim();
-    let ok = false;
-    for (const [g,kw] of Object.entries(GRUPOS)) { if (kw.some(k=>e.includes(k))) { conteos[g]++; ok=true; break; } }
-    if (!ok) conteos['OTROS']++;
-  });
-  const labels = Object.keys(conteos).filter(k=>conteos[k]>0);
+  // Respeta filtros activos: usa el mismo conjunto filtrado que las tarjetas
+  const base = getFiltered().filter(c=>(c.estado||'').toLowerCase().includes('vigente'));
+  const conteos = {}; Object.keys(GRUPOS).forEach(g=>conteos[g]=0); conteos['NOTIFICADO']=conteos['NOTIFICADO']||0; conteos['OTROS']=0;
+  base.forEach(c => { conteos[clasificarCaso(c)]++; });
+
+  const orden = ['DEMANDA','PROC. NOT.','NOTIFICADO','EXCEPCIONES','SUSPENDIDO','PROC. CIERRE','REMATE','OTROS'];
+  const labels = orden.filter(k=>conteos[k]>0);
   const values = labels.map(k=>conteos[k]);
-  const total = vigentes.length;
+  const total = base.length;
   const hoy = new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
   document.getElementById('chartFecha').textContent = hoy;
   document.getElementById('chartTotal').textContent = `Causas Vigentes: ${total}`;
 
   const canvas = document.getElementById('chartCanvas');
-  const W = Math.min(window.innerWidth-40,640);
-  const barH=36, gap=10, labelW=110, H=labels.length*(barH+gap)+20;
-  canvas.width=W; canvas.height=H; canvas.style.cssText=`display:block;width:100%;height:${H}px;margin:0;cursor:pointer`;
+  const cw = canvas.parentElement.clientWidth || 640;
+  const W = Math.min(cw, 900);
+  const isDesktop = window.innerWidth >= 768;
+  const barH = isDesktop ? 30 : 34, gap = isDesktop ? 12 : 10;
+  const labelW = isDesktop ? 130 : 108;
+  const H = labels.length*(barH+gap)+16;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.cssText = `display:block;width:100%;height:${H}px;margin:0;cursor:pointer`;
   const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,W,H);
-  const maxVal = Math.max(...values,1), barMaxW=W-labelW-50;
+  const maxVal = Math.max(...values,1), barMaxW = W-labelW-60;
   const zonas = [];
   labels.forEach((label,i) => {
-    const y=i*(barH+gap)+10, bw=(values[i]/maxVal)*barMaxW, color=GCOL[label]||'#64748b';
-    ctx.fillStyle='#94a3b8'; ctx.font='bold 12px Calibri,sans-serif'; ctx.textAlign='right'; ctx.textBaseline='middle';
-    ctx.fillText(label,labelW-8,y+barH/2);
-    ctx.fillStyle='#172236'; ctx.beginPath(); ctx.roundRect(labelW,y,barMaxW,barH,6); ctx.fill();
-    if (bw>0) { ctx.fillStyle=color; ctx.beginPath(); ctx.roundRect(labelW,y,bw,barH,6); ctx.fill(); }
-    ctx.fillStyle='#e2eaf5'; ctx.font='bold 13px Calibri,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle';
-    ctx.fillText(values[i],labelW+bw+8,y+barH/2);
+    const y=i*(barH+gap)+8, bw=Math.max((values[i]/maxVal)*barMaxW, values[i]>0?4:0), color=GCOL[label]||'#64748b';
+    ctx.fillStyle='#94a3b8'; ctx.font=`bold ${isDesktop?13:12}px Calibri,sans-serif`; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(label,labelW-10,y+barH/2);
+    ctx.fillStyle='#172236'; ctx.beginPath(); ctx.roundRect(labelW,y,barMaxW,barH,7); ctx.fill();
+    if (bw>0) { ctx.fillStyle=color; ctx.beginPath(); ctx.roundRect(labelW,y,bw,barH,7); ctx.fill(); }
+    ctx.fillStyle='#e2eaf5'; ctx.font=`bold ${isDesktop?14:13}px Calibri,sans-serif`; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(values[i],labelW+bw+10,y+barH/2);
     zonas.push({y,h:barH,label});
   });
   canvas.onclick = e => {
-    const rect=canvas.getBoundingClientRect(), scaleY=canvas.height/rect.height;
+    const rect=canvas.getBoundingClientRect(), scaleY=H/rect.height;
     const cy=(e.clientY-rect.top)*scaleY;
     const zona=zonas.find(z=>cy>=z.y&&cy<=z.y+z.h); if (!zona) return;
-    const kw=GRUPOS[zona.label]||[];
-    const casos=vigentes.filter(c=>{ const et=(c.etapa||'').toLowerCase().trim(); if(zona.label==='OTROS') return !Object.values(GRUPOS).flat().some(k=>et.includes(k)); return kw.some(k=>et.includes(k)); });
+    const casos=base.filter(c=>clasificarCaso(c)===zona.label);
     closeOverlay('chartOverlay'); setTimeout(()=>renderCards(casos),300);
   };
   const legend=document.getElementById('chartLegend'); legend.innerHTML='';
   labels.forEach((label,i) => {
     const pct=total>0?((values[i]/total)*100).toFixed(1):'0.0', color=GCOL[label]||'#64748b';
     const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer';
-    row.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:3px;background:${color}"></div><span style="font-size:12px;font-weight:600">${label}</span></div><div style="display:flex;gap:10px;align-items:center"><span style="font-size:11px;color:var(--muted)">${pct}%</span><span style="font-size:13px;font-weight:700;color:${color}">${values[i]}</span></div>`;
-    const kw=GRUPOS[label]||[];
-    row.addEventListener('click',()=>{ const casos=vigentes.filter(c=>{ const et=(c.etapa||'').toLowerCase().trim(); if(label==='OTROS') return !Object.values(GRUPOS).flat().some(k=>et.includes(k)); return kw.some(k=>et.includes(k)); }); closeOverlay('chartOverlay'); setTimeout(()=>renderCards(casos),300); });
+    row.style.cssText='display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer';
+    row.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:3px;background:${color}"></div><span style="font-size:13px;font-weight:600">${label}</span></div><div style="display:flex;gap:12px;align-items:center"><span style="font-size:11px;color:var(--muted)">${pct}%</span><span style="font-size:14px;font-weight:700;color:${color}">${values[i]}</span></div>`;
+    row.addEventListener('click',()=>{ const casos=base.filter(c=>clasificarCaso(c)===label); closeOverlay('chartOverlay'); setTimeout(()=>renderCards(casos),300); });
     legend.appendChild(row);
   });
   openOverlay('chartOverlay');
