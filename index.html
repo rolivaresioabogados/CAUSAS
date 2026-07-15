@@ -354,7 +354,7 @@ const DEFAULT_CFG = {
 
 let allCausas = [], validacion = {};
 let selEstados = new Set(), selICA = false, selAlertaNot = false;
-let selAlertaEmb = false, selBSAN = false, selBCH = false, selAbogado = null;
+let selAlertaEmb = false, selBSAN = false, selBCH = false, selAbogados = new Set();
 let editingId = null;
 let config = Object.assign({}, DEFAULT_CFG);
 
@@ -516,7 +516,7 @@ async function loadData() {
       obs:gcv(row,config.col_obs), instruccion:gcv(row,config.col_instruccion),
     })).filter(c => c.cliente||c.rol||c.demandado);
 
-    selEstados.clear(); selICA=false; selAlertaNot=false; selAlertaEmb=false; selBSAN=false; selBCH=false; selAbogado=null;
+    selEstados.clear(); selICA=false; selAlertaNot=false; selAlertaEmb=false; selBSAN=false; selBCH=false; selAbogados.clear();
     buildEstadoBar();
     buildAbogadoBar();
     applyFilters();
@@ -608,7 +608,7 @@ function getFiltered() {
     const mQ = !q || txt.includes(q);
     const mE = selEstados.size===0 || selEstados.has(c.estado||'Sin estado');
     const mI = !selICA || !!c.rolica;
-    const mA = !selAbogado || c.abogado===selAbogado;
+    const mA = selAbogados.size===0 || selAbogados.has(c.abogado);
     const mAN = !selAlertaNot || (diasEntre(c.fecha) > 90 && !c.notif);
     const mAE = !selAlertaEmb || (diasEntre(c.notif) > 30 && !c.embargo);
     const mBS = !selBSAN || (c.cliente||'').toUpperCase().includes('SANTANDER');
@@ -668,20 +668,24 @@ function buildAbogadoBar() {
   const allBtn = document.createElement('button');
   allBtn.className = 'abog-btn active'; allBtn.dataset.key='all';
   allBtn.innerHTML = `Todos <span class="n">${allCausas.length}</span>`;
-  allBtn.addEventListener('click', () => { selAbogado=null; syncAbogadoBtns(); applyFilters(); });
+  allBtn.addEventListener('click', () => { selAbogados.clear(); syncAbogadoBtns(); applyFilters(); });
   bar.appendChild(allBtn);
   abogados.forEach(a => {
     const btn = document.createElement('button');
     btn.className = 'abog-btn'; btn.dataset.abogado=a;
     btn.innerHTML = `${a} <span class="n">${allCausas.filter(c=>c.abogado===a).length}</span>`;
-    btn.addEventListener('click', () => { selAbogado = selAbogado===a?null:a; syncAbogadoBtns(); applyFilters(); });
+    btn.addEventListener('click', () => {
+      if (selAbogados.has(a)) selAbogados.delete(a);
+      else selAbogados.add(a);
+      syncAbogadoBtns(); applyFilters();
+    });
     bar.appendChild(btn);
   });
 }
 
 function syncAbogadoBtns() {
   document.querySelectorAll('#abogadoBar .abog-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.key==='all' ? !selAbogado : btn.dataset.abogado===selAbogado);
+    btn.classList.toggle('active', btn.dataset.key==='all' ? selAbogados.size===0 : selAbogados.has(btn.dataset.abogado));
   });
 }
 
@@ -692,7 +696,7 @@ function updateAllCounts() {
     const mQ = !q||txt.includes(q);
     const mE = excluir==='estado'?true:(selEstados.size===0||selEstados.has(c.estado||'Sin estado'));
     const mI = excluir==='ica'?true:(!selICA||!!c.rolica);
-    const mA = excluir==='abog'?true:(!selAbogado||c.abogado===selAbogado);
+    const mA = excluir==='abog'?true:(selAbogados.size===0||selAbogados.has(c.abogado));
     const mAN = excluir==='not'?true:(!selAlertaNot||(diasEntre(c.fecha)>90&&!c.notif));
     const mAE = excluir==='emb'?true:(!selAlertaEmb||(diasEntre(c.notif)>30&&!c.embargo));
     const mBS = excluir==='bsan'?true:(!selBSAN||(c.cliente||'').toUpperCase().includes('SANTANDER'));
