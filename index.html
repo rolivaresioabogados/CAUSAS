@@ -58,8 +58,10 @@
     .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
     .chip .n { font-size: 11px; font-weight: 800; background: rgba(0,0,0,0.2); padding: 1px 7px; border-radius: 100px; min-width: 24px; text-align: center; }
     .chip.active { background: var(--accent); border-color: var(--accent); color: #0b1220; }
-    .chip.c-ica { color: #a78bfa; border-color: rgba(139,92,246,0.4); }
-    .chip.c-ica.active { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
+    .chip.c-tanner { color: #a78bfa; border-color: rgba(139,92,246,0.4); }
+    .chip.c-tanner.active { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
+    .chip.c-otros { color: #94a3b8; border-color: rgba(148,163,184,0.4); }
+    .chip.c-otros.active { background: #64748b; border-color: #64748b; color: #fff; }
     .chip.c-alerta { color: var(--danger); border-color: rgba(244,63,94,0.4); }
     .chip.c-alerta.active { background: var(--danger); border-color: var(--danger); color: #fff; }
     .chip.c-bsan { color: #f97316; border-color: rgba(249,115,22,0.4); }
@@ -356,8 +358,16 @@ const DEFAULT_CFG = {
 };
 
 let allCausas = [], validacion = {};
-let selEstados = new Set(), selICA = false, selAlertaNot = false;
-let selAlertaEmb = false, selBSAN = false, selBCH = false, selAbogados = new Set();
+let selEstados = new Set(), selClientes = new Set(), selAlertaNot = false;
+let selAlertaEmb = false, selAbogados = new Set();
+// Grupo de cliente para los chips: BSAN, BCH, TANNER u OTROS
+function grupoCliente(c) {
+  const cl = (c.cliente||'').toUpperCase();
+  if (cl.includes('SANTANDER')) return 'BSAN';
+  if (/BANCO\s+(DE\s+)?CHILE/.test(cl)) return 'BCH';
+  if (cl.includes('TANNER')) return 'TANNER';
+  return 'OTROS';
+}
 let editingId = null;
 let config = Object.assign({}, DEFAULT_CFG);
 
@@ -519,7 +529,7 @@ async function loadData() {
       obs:gcv(row,config.col_obs), instruccion:gcv(row,config.col_instruccion),
     })).filter(c => c.cliente||c.rol||c.demandado);
 
-    selEstados.clear(); selICA=false; selAlertaNot=false; selAlertaEmb=false; selBSAN=false; selBCH=false; selAbogados.clear();
+    selEstados.clear(); selClientes.clear(); selAlertaNot=false; selAlertaEmb=false; selAbogados.clear();
     buildEstadoBar();
     buildAbogadoBar();
     applyFilters();
@@ -610,13 +620,11 @@ function getFiltered() {
     const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs,c.ncaso].join(' ').toLowerCase();
     const mQ = !q || txt.includes(q);
     const mE = selEstados.size===0 || selEstados.has(c.estado||'Sin estado');
-    const mI = !selICA || !!c.rolica;
+    const mC = selClientes.size===0 || selClientes.has(grupoCliente(c));
     const mA = selAbogados.size===0 || selAbogados.has(c.abogado);
     const mAN = !selAlertaNot || (diasEntre(c.fecha) > 90 && !c.notif);
     const mAE = !selAlertaEmb || (diasEntre(c.notif) > 30 && !c.embargo);
-    const mBS = !selBSAN || (c.cliente||'').toUpperCase().includes('SANTANDER');
-    const mBC = !selBCH || (c.cliente||'').toUpperCase().includes('BANCO CHILE');
-    return mQ && mE && mI && mA && mAN && mAE && mBS && mBC;
+    return mQ && mE && mC && mA && mAN && mAE;
   });
 }
 
@@ -628,9 +636,8 @@ function buildEstadoBar() {
   bar.innerHTML = '';
   const estados = {};
   allCausas.forEach(c => { const e=c.estado||'Sin estado'; estados[e]=(estados[e]||0)+1; });
-  const icaCount = allCausas.filter(c=>c.rolica).length;
-  const bsanCount = allCausas.filter(c=>(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
-  const bchCount = allCausas.filter(c=>(c.cliente||'').toUpperCase().includes('BANCO CHILE')).length;
+  const cliCount = { BSAN:0, BCH:0, TANNER:0, OTROS:0 };
+  allCausas.forEach(c => { cliCount[grupoCliente(c)]++; });
   const notCount = allCausas.filter(c=>diasEntre(c.fecha)>90&&!c.notif).length;
   const embCount = allCausas.filter(c=>diasEntre(c.notif)>30&&!c.embargo).length;
 
@@ -644,11 +651,17 @@ function buildEstadoBar() {
     return chip;
   };
 
-  mkChip('BSAN', bsanCount, 'c-bsan', function() { selBSAN=!selBSAN; this.classList.toggle('active',selBSAN); applyFilters(); });
-  mkChip('BCH', bchCount, 'c-bch', function() { selBCH=!selBCH; this.classList.toggle('active',selBCH); applyFilters(); });
-  mkChip('ICA', icaCount, 'c-ica', function() { selICA=!selICA; this.classList.toggle('active',selICA); applyFilters(); });
-  mkChip('ALERTA NOT', notCount, 'c-alerta', function() { selAlertaNot=!selAlertaNot; this.classList.toggle('active',selAlertaNot); applyFilters(); });
-  mkChip('ALERTA EMB', embCount, 'c-alerta', function() { selAlertaEmb=!selAlertaEmb; this.classList.toggle('active',selAlertaEmb); applyFilters(); });
+  [['BSAN','c-bsan'],['BCH','c-bch'],['TANNER','c-tanner'],['OTROS','c-otros']].forEach(([g,cls]) => {
+    const chip = mkChip(g, cliCount[g], cls, function() {
+      if (selClientes.has(g)) selClientes.delete(g); else selClientes.add(g);
+      this.classList.toggle('active', selClientes.has(g)); applyFilters();
+    });
+    if (chip) chip.dataset.cliente = g;
+  });
+  const chN = mkChip('ALERTA NOT', notCount, 'c-alerta', function() { selAlertaNot=!selAlertaNot; this.classList.toggle('active',selAlertaNot); applyFilters(); });
+  if (chN) chN.dataset.alerta = 'not';
+  const chE = mkChip('ALERTA EMB', embCount, 'c-alerta', function() { selAlertaEmb=!selAlertaEmb; this.classList.toggle('active',selAlertaEmb); applyFilters(); });
+  if (chE) chE.dataset.alerta = 'emb';
 
   Object.entries(estados).forEach(([e,n]) => {
     const s = getStatus(e);
@@ -698,20 +711,16 @@ function updateAllCounts() {
     const txt = [c.cliente,c.demandado,c.rut,c.rol,c.rolica,c.tribunal,c.abogado,c.abog_coord,c.materia,c.etapa,c.obs,c.ncaso].join(' ').toLowerCase();
     const mQ = !q||txt.includes(q);
     const mE = excluir==='estado'?true:(selEstados.size===0||selEstados.has(c.estado||'Sin estado'));
-    const mI = excluir==='ica'?true:(!selICA||!!c.rolica);
+    const mC = excluir==='cliente'?true:(selClientes.size===0||selClientes.has(grupoCliente(c)));
     const mA = excluir==='abog'?true:(selAbogados.size===0||selAbogados.has(c.abogado));
     const mAN = excluir==='not'?true:(!selAlertaNot||(diasEntre(c.fecha)>90&&!c.notif));
     const mAE = excluir==='emb'?true:(!selAlertaEmb||(diasEntre(c.notif)>30&&!c.embargo));
-    const mBS = excluir==='bsan'?true:(!selBSAN||(c.cliente||'').toUpperCase().includes('SANTANDER'));
-    const mBC = excluir==='bch'?true:(!selBCH||(c.cliente||'').toUpperCase().includes('BANCO CHILE'));
-    return mQ&&mE&&mI&&mA&&mAN&&mAE&&mBS&&mBC;
+    return mQ&&mE&&mC&&mA&&mAN&&mAE;
   };
   document.querySelectorAll('#estadoBar .chip').forEach(chip => {
     const nEl = chip.querySelector('.n'); if (!nEl) return;
     let count = 0;
-    if (chip.classList.contains('c-bsan')) count = allCausas.filter(c=>base(c,'bsan')&&(c.cliente||'').toUpperCase().includes('SANTANDER')).length;
-    else if (chip.classList.contains('c-bch')) count = allCausas.filter(c=>base(c,'bch')&&(c.cliente||'').toUpperCase().includes('BANCO CHILE')).length;
-    else if (chip.classList.contains('c-ica')) count = allCausas.filter(c=>base(c,'ica')&&!!c.rolica).length;
+    if (chip.dataset.cliente) count = allCausas.filter(c=>base(c,'cliente')&&grupoCliente(c)===chip.dataset.cliente).length;
     else if (chip.dataset.alerta==='not') count = allCausas.filter(c=>base(c,'not')&&diasEntre(c.fecha)>90&&!c.notif).length;
     else if (chip.dataset.alerta==='emb') count = allCausas.filter(c=>base(c,'emb')&&diasEntre(c.notif)>30&&!c.embargo).length;
     else if (chip.dataset.estado) count = allCausas.filter(c=>base(c,'estado')&&(c.estado||'Sin estado')===chip.dataset.estado).length;
