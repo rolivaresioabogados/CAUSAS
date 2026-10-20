@@ -653,8 +653,11 @@ function buildEstadoBar() {
 
   [['BSAN','c-bsan'],['BCH','c-bch'],['TANNER','c-tanner'],['OTROS','c-otros']].forEach(([g,cls]) => {
     const chip = mkChip(g, cliCount[g], cls, function() {
-      if (selClientes.has(g)) selClientes.delete(g); else selClientes.add(g);
-      this.classList.toggle('active', selClientes.has(g)); applyFilters();
+      // Selección única: un cliente a la vez (tocar de nuevo lo desactiva)
+      const activar = !selClientes.has(g);
+      selClientes.clear(); if (activar) selClientes.add(g);
+      document.querySelectorAll('#estadoBar .chip[data-cliente]').forEach(ch => ch.classList.toggle('active', selClientes.has(ch.dataset.cliente)));
+      applyFilters();
     });
     if (chip) chip.dataset.cliente = g;
   });
